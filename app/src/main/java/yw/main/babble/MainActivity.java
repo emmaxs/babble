@@ -8,6 +8,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import java.io.OutputStreamWriter;
 
 public class MainActivity extends AppCompatActivity {
     EditText editText;
+    String filename = "Note1.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,19 +33,20 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         editText = findViewById(R.id.EditText);
-        File[] files = getFilesDir().listFiles();
-        final String fileName = "Note" + files.length + ".txt";
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                File[] files = getFilesDir().listFiles();
+                filename = "Note" + files.length + ".txt";
+                Log.d("exs", filename);
                 // get a new file name to save
-                Save(fileName);
+                Save(filename);
             }
         });
         // set these strings better
-        editText.setText(Open(fileName));
+        editText.setText(Open(filename));
     }
 
 
