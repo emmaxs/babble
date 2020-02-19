@@ -34,7 +34,8 @@ public class NoteActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.EditText);
         File[] files = getFilesDir().listFiles();
-        filename = "Note" + files.length + 1 + ".txt";
+        int fileNumber = files.length + 1;
+        filename = "Note" + fileNumber + ".txt";
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -43,6 +44,10 @@ public class NoteActivity extends AppCompatActivity {
                 Log.d("exs", filename);
                 // get a new file name to save
                 Save(filename);
+                // close the activity
+                // TODO: Start Activity for Result from Main
+                Intent myIntent = new Intent(NoteActivity.this, MainActivity.class);
+                NoteActivity.this.startActivity(myIntent);
             }
         });
         // set these strings better

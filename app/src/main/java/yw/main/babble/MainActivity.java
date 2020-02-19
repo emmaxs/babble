@@ -8,6 +8,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         nAdapter = new NotesAdapter(notesList, this);
         listView.setAdapter(nAdapter);
 
+        // TODO: Add onClick Listener to select notes
         prepareNotes();
     }
 

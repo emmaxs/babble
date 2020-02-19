@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Babble</string>
-    <string name="title_activity_main">Notes</string>
-    <string name="title_activity_note_select">NoteSelect</string>
-    <string name="action_settings">List Notes</string>
+    <string name="title_activity_note_select">Note</string>
+    <string name="action_settings">See All Notes</string>
 </resources>
