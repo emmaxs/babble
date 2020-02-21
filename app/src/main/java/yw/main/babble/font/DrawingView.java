@@ -1,4 +1,4 @@
-package yw.main.babble;
+package yw.main.babble.font;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,9 +6,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.media.ThumbnailUtils;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DrawingView extends View {
     private Paint mPaint;
@@ -27,7 +34,7 @@ public class DrawingView extends View {
     private Canvas mCanvas;
     private Path mPath;
     private Paint mBitmapPaint;
-
+    private int startBtnPressLoc = -1;
     Context context;
     private Paint circlePaint;
     private Path circlePath;
@@ -138,16 +145,10 @@ public class DrawingView extends View {
                 invalidate();
                 break;
             case BACK_AREA:
-                Log.d("handleDown","back");
-                break;
             case CLEAR_AREA:
-                Log.d("handleDown","clear");
-                break;
             case SAVE_AREA:
-                Log.d("handleDown","save");
-                break;
             case NEXT_AREA:
-                Log.d("handleDown","next");
+                startBtnPressLoc = checkArea(x, y);
                 break;
         }
 
@@ -195,13 +196,78 @@ public class DrawingView extends View {
                 invalidate();
                 break;
             case BACK_AREA:
+                if(startBtnPressLoc == BACK_AREA) {
+                    back();
+                }
                 break;
             case CLEAR_AREA:
+                if(startBtnPressLoc == CLEAR_AREA) {
+                    clear();
+                }
                 break;
             case SAVE_AREA:
+                if(startBtnPressLoc == SAVE_AREA) {
+                    save();
+                }
                 break;
             case NEXT_AREA:
+                if(startBtnPressLoc == NEXT_AREA){
+                    next();
+                }
                 break;
+        }
+    }
+
+    private void next() {
+        Log.d("button","next");
+    }
+
+    private void save() {
+        Log.d("button","save");
+        Bitmap drawing = getDrawingCache();
+        drawing = ThumbnailUtils.extractThumbnail(drawing, 256, 256);
+        SaveBitmapAsyncTask task = new SaveBitmapAsyncTask();
+        task.execute(new BitmapAndChar(drawing, 'a'));
+    }
+
+    private void clear() {
+        Log.d("button","clear");
+        setDrawingCacheEnabled(false);
+        onSizeChanged(getWidth(), getHeight(), getWidth(), getHeight());
+        invalidate();
+        setDrawingCacheEnabled(true);
+    }
+
+    private void back() {
+        Log.d("button","back");
+    }
+
+    private class SaveBitmapAsyncTask extends AsyncTask<BitmapAndChar, Void, Void> {
+        @Override
+        protected Void doInBackground(BitmapAndChar... bitmaps) {
+            //TODO: write bitmap to file with some sorta name like "font_<bitmaps[0].getChar()>.bmp"
+            return null;
+        }
+    }
+
+    private class BitmapAndChar {
+        private Bitmap bitmap;
+        private char aChar;
+        public BitmapAndChar(Bitmap bp, char c) {
+            bitmap = bp;
+            aChar = c;
+        }
+        public Bitmap getBitmap() {
+            return bitmap;
+        }
+        public void setBitmap(Bitmap bitmap) {
+            this.bitmap = bitmap;
+        }
+        public char getaChar() {
+            return aChar;
+        }
+        public void setaChar(char aChar) {
+            this.aChar = aChar;
         }
     }
 }

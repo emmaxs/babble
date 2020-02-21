@@ -1,16 +1,11 @@
 package yw.main.babble;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
+
+import yw.main.babble.font.DrawingView;
 
 public class FontDrawActivity extends Activity {
 
