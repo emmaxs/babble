@@ -9,6 +9,7 @@ import com.ibm.cloud.sdk.core.security.IamAuthenticator;
 import com.ibm.watson.tone_analyzer.v3.ToneAnalyzer;
 import com.ibm.watson.tone_analyzer.v3.model.ToneAnalysis;
 import com.ibm.watson.tone_analyzer.v3.model.ToneOptions;
+import com.ibm.watson.tone_analyzer.v3.model.ToneScore;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -31,6 +32,8 @@ public class NoteActivity extends AppCompatActivity {
     EditText editText;
     String filename = "";
 
+    IamAuthenticator authenticator;
+    ToneAnalyzer toneAnalyzer;
     ToneOptions options;
     String textToAnalyze;
     String toastMessage;
@@ -51,52 +54,38 @@ public class NoteActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("exs", filename);
-//
-//                // Get tone options
-//                options = new ToneOptions.Builder()
-//                        .addTone(Tone.EMOTION)
-//                        .html(false).build();
-//
-//                // Get string from Edit Text
-//                textToAnalyze = editText.getText().toString();
-//
-//                // Tone analysis
-//                toneAnalyzer.getTone(textToAnalyze, options).enqueue(
-//                        new ServiceCallback<ToneAnalysis>() {
-//                            @Override
-//                            public void onResponse(ToneAnalysis response) {
-//                                // More code here
-//                                List<ToneScore> scores = response.getDocumentTone()
-//                                        .getTones()
-//                                        .get(0)
-//                                        .getTones();
-//                                String detectedTones = "";
-//                                for(ToneScore score:scores) {
-//                                    if(score.getScore() > 0.5f) {
-//                                        detectedTones += score.getName() + " ";
-//                                    }
-//                                }
-//
-//                                toastMessage =
-//                                        "The following emotions were detected:\n\n"
-//                                                + detectedTones.toUpperCase();
-//
-//                                // Run the toast on UI
-//                                runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        Toast.makeText(getBaseContext(),
-//                                                toastMessage, Toast.LENGTH_LONG).show();
-//                                    }
-//                                });
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        });
+
+                // Get string from Edit Text
+                textToAnalyze = editText.getText().toString();
+                // Build the tone options
+                options = new ToneOptions.Builder().text(textToAnalyze).build();
+                // Query the service
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
+                        List<ToneScore> scores = toneAnalysis.getDocumentTone()
+                                        .getTones();
+                                String detectedTones = "";
+                                for(ToneScore score:scores) {
+                                    if(score.getScore() > 0.5f) {
+                                        detectedTones += score.getToneName() + " ";
+                                    }
+                                }
+                                toastMessage =
+                                        "The following emotions were detected:\n\n"
+                                                + detectedTones.toUpperCase();
+
+                                // Run the toast on UI
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getBaseContext(),
+                                                toastMessage, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                    }
+                });
 
                 // get a new file name to save
                 Save(filename);
@@ -109,21 +98,10 @@ public class NoteActivity extends AppCompatActivity {
         // set these strings better
         editText.setText(Open(filename));
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                //TODO your background code
-                Log.d("exs", "running background code");
-                IamAuthenticator authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
-                ToneAnalyzer toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
-                toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
-                String text = "I am happy";
-                options = new ToneOptions.Builder().text(text).build();
-
-                ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
-                Log.d("exs", toneAnalysis.toString());
-            }
-        });
+        // Sentiment analysis
+        authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
+        toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
+        toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
     }
 
 
