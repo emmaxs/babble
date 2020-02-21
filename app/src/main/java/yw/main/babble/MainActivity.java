@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -39,7 +40,13 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.startActivity(myIntent);
             }
         });
-
+        ((Button) findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(MainActivity.this, FontDrawActivity.class);
+                MainActivity.this.startActivity(myIntent);
+            }
+        });
         listView = findViewById(R.id.notes);
 
         nAdapter = new NotesAdapter(notesList, this);
