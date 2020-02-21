@@ -57,8 +57,8 @@ public class NoteActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu_main; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        // Inflate the menu_note_activity; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_note_activity, menu);
         return true;
     }
 

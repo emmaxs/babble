@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -24,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<NotesBuilder> notesList = new ArrayList<>();
     private NotesAdapter nAdapter;
     private ListView listView;
+
+    // firebase
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +61,16 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: Add onClick Listener to select notes
         prepareNotes();
+
+        // Here we check if the user is logged in and, if not, open the login screen
+        // Initialize Firebase Auth
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
+        // if nobody is logged in, load login screen
+        if (firebaseUser == null) {
+            loadLoginScreen();
+        }
     }
 
     private void prepareNotes() {
@@ -90,6 +107,40 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return content;
+    }
+
+    // method to open the login activity
+    // leah, 2.21.20
+    private void loadLoginScreen() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        // so that user cannot press back button and get back to main activity
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu_note_activity; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main_activity, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.logout) {
+            // sign out
+            firebaseAuth.signOut();;
+            loadLoginScreen();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
