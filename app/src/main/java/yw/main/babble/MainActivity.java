@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -23,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<NotesBuilder> notesList = new ArrayList<>();
     private NotesAdapter nAdapter;
     private ListView listView;
+
+    // firebase
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,16 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: Add onClick Listener to select notes
         prepareNotes();
+
+        // Here we check if the user is logged in and, if not, open the login screen
+        // Initialize Firebase Auth
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
+        // if nobody is logged in, load login screen
+        if (firebaseUser == null) {
+            loadLoginScreen();
+        }
     }
 
     private void prepareNotes() {
@@ -83,6 +99,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return content;
+    }
+
+    // method to open the login activity
+    // leah, 2.21.20
+    private void loadLoginScreen() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        // so that user cannot press back button and get back to main activity
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
 }
