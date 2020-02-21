@@ -2,6 +2,11 @@
     <string name="app_name">Babble</string>
     <string name="title_activity_note_select">Note</string>
     <string name="action_settings">See All Notes</string>
+
+    <!-- used by main activity -->
+    <string name="logout">Log Out</string>
+
+    <!-- used by login and signout activities-->
     <string name="password_hint">Password</string>
     <string name="email_hint">Email</string>
     <string name="login">Log in</string>
