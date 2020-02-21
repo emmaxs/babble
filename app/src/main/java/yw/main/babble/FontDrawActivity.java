@@ -9,7 +9,7 @@ import yw.main.babble.font.DrawingView;
 
 public class FontDrawActivity extends Activity {
 
-    DrawingView dv ;
+    DrawingView dv;
     private Paint mPaint;
 
     @Override
