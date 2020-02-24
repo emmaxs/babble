@@ -5,11 +5,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import com.ibm.cloud.sdk.core.security.IamAuthenticator;
 import com.ibm.watson.tone_analyzer.v3.ToneAnalyzer;
 import com.ibm.watson.tone_analyzer.v3.model.ToneAnalysis;
 import com.ibm.watson.tone_analyzer.v3.model.ToneOptions;
 import com.ibm.watson.tone_analyzer.v3.model.ToneScore;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -37,6 +44,13 @@ public class NoteActivity extends AppCompatActivity {
     ToneOptions options;
     String textToAnalyze;
     String toastMessage;
+
+    // firebase
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
+    private DatabaseReference database;
+    private String userId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,12 +112,19 @@ public class NoteActivity extends AppCompatActivity {
         // set these strings better
         editText.setText(Open(filename));
 
+        // firebase things (we know there wil be a current user since you must be
+        // logged in to get to this page
+        database = FirebaseDatabase.getInstance().getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
         // Sentiment analysis
         authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
         toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
         toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
     }
 
+    //TODO:
 
     // Change function to work with firebase
     public void Save(String fileName) {
