@@ -4,29 +4,25 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Toast;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<NotesBuilder> notesList = new ArrayList<>();
-    private NotesAdapter nAdapter;
-    private ListView listView;
+    private AppBarConfiguration mAppBarConfiguration;
 
     // firebase
     private FirebaseAuth firebaseAuth;
@@ -35,32 +31,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(MainActivity.this, NoteActivity.class);
-                MainActivity.this.startActivity(myIntent);
-            }
-        });
-        ((Button) findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(MainActivity.this, FontDrawActivity.class);
-                MainActivity.this.startActivity(myIntent);
-            }
-        });
-        listView = findViewById(R.id.notes);
-
-        nAdapter = new NotesAdapter(notesList, this);
-        listView.setAdapter(nAdapter);
-
-        // TODO: Add onClick Listener to select notes
-        prepareNotes();
 
         // Here we check if the user is logged in and, if not, open the login screen
         // Initialize Firebase Auth
@@ -69,44 +39,36 @@ public class MainActivity extends AppCompatActivity {
 
         // if nobody is logged in, load login screen
         if (firebaseUser == null) {
+            Log.d("exs", "Firebase User is null");
             loadLoginScreen();
         }
-    }
 
-    private void prepareNotes() {
-        File directory;
-        directory = getFilesDir();
-        File[] files = directory.listFiles();
-        String theFile;
-        for (int f = 1; f <= files.length; f++) {
-            theFile = "Note" + f + ".txt";
-            NotesBuilder note = new NotesBuilder(theFile, Open(theFile));
-            notesList.add(note);
-        }
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-    }
-
-    // duplicate method - try to reduce or do in thread
-    public String Open(String fileName) {
-        String content = "";
-        try {
-            InputStream in = openFileInput(fileName);
-            if ( in != null) {
-                InputStreamReader tmp = new InputStreamReader( in );
-                BufferedReader reader = new BufferedReader(tmp);
-                String str;
-                StringBuilder buf = new StringBuilder();
-                while ((str = reader.readLine()) != null) {
-                    buf.append(str + "\n");
-                } in .close();
-
-                content = buf.toString();
+        // TODO: Add Snackbar
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(MainActivity.this, NoteActivity.class);
+                MainActivity.this.startActivity(myIntent);
             }
-        } catch (java.io.FileNotFoundException e) {} catch (Throwable t) {
-            Toast.makeText(this, "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
-        }
+        });
 
-        return content;
+        // Navigation Drawer
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.nav_share)
+                .setDrawerLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
     }
 
     // method to open the login activity
@@ -122,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu_note_activity; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main_activity, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -141,6 +103,13 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
     }
 
 }
