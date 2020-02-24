@@ -105,13 +105,6 @@ public class NoteActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu_note_activity; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_note_activity, menu);
-        return true;
-    }
-
     // Change function to work with firebase
     public void Save(String fileName) {
         try {
@@ -151,21 +144,4 @@ public class NoteActivity extends AppCompatActivity {
         }
         return content;
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent myIntent = new Intent(NoteActivity.this, MainActivity.class);
-            NoteActivity.this.startActivity(myIntent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
 }
