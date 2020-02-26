@@ -14,6 +14,7 @@ import com.ibm.watson.tone_analyzer.v3.model.ToneScore;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -47,8 +48,8 @@ public class NoteActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.EditText);
         Intent intent = getIntent();
-        if (intent != null) {
-            fileNumber = intent.getIntExtra(NotesFragment.NOTE_INDEX, 0);
+        if (intent.getIntExtra(NotesFragment.NOTE_INDEX, 0) != 0) {
+            fileNumber = intent.getIntExtra(NotesFragment.NOTE_INDEX, 0) + 1;
         }
         else {
             File[] files = getFilesDir().listFiles();

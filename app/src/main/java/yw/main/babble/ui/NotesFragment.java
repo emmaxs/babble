@@ -1,5 +1,6 @@
 package yw.main.babble.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -34,11 +35,11 @@ public class NotesFragment extends Fragment {
     private NotesAdapter nAdapter;
     private ListView listView;
     public static final String NOTE_INDEX = "NOTE_INDEX";
+    public static final int SAVE_ENTRY = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
     }
 
     @Override
@@ -58,22 +59,19 @@ public class NotesFragment extends Fragment {
                 Intent intent;
                 intent = new Intent(getActivity(), NoteActivity.class);
                 // This will change once we have a real db
-                intent.putExtra(NOTE_INDEX, position + 1);
+                intent.putExtra(NOTE_INDEX, position);
 
-//                startActivityForResult(intent, SAVE_ENTRY);
-                startActivity(intent);
+                startActivityForResult(intent, SAVE_ENTRY);
             }
         });
 
-        ((Button) root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
+        (root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(getActivity(), FontDrawActivity.class);
                 startActivity(myIntent);
             }
         });
-
-        // TODO: Add onClick Listener to select notes
         prepareNotes();
         return root;
     }
@@ -83,12 +81,29 @@ public class NotesFragment extends Fragment {
         directory = getActivity().getFilesDir();
         File[] files = directory.listFiles();
         String theFile;
+        Log.d("exs", "File length is " + files.length);
         for (int f = 1; f <= files.length; f++) {
             theFile = "Note" + f + ".txt";
             NotesBuilder note = new NotesBuilder(theFile, Open(theFile));
             notesList.add(note);
         }
+    }
 
+    public void onDataSetChanged() {
+        notesList.clear();
+        prepareNotes();
+        nAdapter.notifyDataSetChanged();
+    }
+
+    // Put them back after config change
+    @Override
+    public void onResume() {
+        super.onResume();
+        // put the entries back in the adapter
+        if (notesList != null) {
+            nAdapter = new NotesAdapter(notesList, getActivity());
+            listView.setAdapter(nAdapter);
+        }
     }
 
     // duplicate method - try to reduce or do in thread
@@ -112,6 +127,16 @@ public class NotesFragment extends Fragment {
         }
 
         return content;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SAVE_ENTRY) {
+            if (resultCode == Activity.RESULT_OK) {
+                onDataSetChanged();
+            }
+        }
     }
 
 }
