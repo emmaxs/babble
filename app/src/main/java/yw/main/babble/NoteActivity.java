@@ -1,5 +1,6 @@
 package yw.main.babble;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ public class NoteActivity extends AppCompatActivity {
     EditText editText;
     int fileNumber;
     String filename = "";
+    Intent intent;
 
     IamAuthenticator authenticator;
     ToneAnalyzer toneAnalyzer;
@@ -47,7 +49,7 @@ public class NoteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         editText = findViewById(R.id.EditText);
-        Intent intent = getIntent();
+        intent = getIntent();
         if (intent.getIntExtra(NotesFragment.NOTE_INDEX, 0) != 0) {
             fileNumber = intent.getIntExtra(NotesFragment.NOTE_INDEX, 0) + 1;
         }
@@ -96,6 +98,7 @@ public class NoteActivity extends AppCompatActivity {
 
                 // get a new file name to save
                 Save(filename);
+                setResult(Activity.RESULT_OK, intent);
                 // close the activity
                 finish();
             }

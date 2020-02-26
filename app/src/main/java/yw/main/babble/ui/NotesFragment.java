@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -48,6 +50,16 @@ public class NotesFragment extends Fragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_notes, container, false);
 
+        // TODO: Add Snackbar
+        FloatingActionButton fab = root.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(getActivity(), NoteActivity.class);
+                startActivityForResult(myIntent, NotesFragment.SAVE_ENTRY);
+            }
+        });
+
         listView = root.findViewById(R.id.notes);
 
         nAdapter = new NotesAdapter(notesList, getActivity());
@@ -60,7 +72,6 @@ public class NotesFragment extends Fragment {
                 intent = new Intent(getActivity(), NoteActivity.class);
                 // This will change once we have a real db
                 intent.putExtra(NOTE_INDEX, position);
-
                 startActivityForResult(intent, SAVE_ENTRY);
             }
         });
@@ -72,7 +83,9 @@ public class NotesFragment extends Fragment {
                 startActivity(myIntent);
             }
         });
+
         prepareNotes();
+
         return root;
     }
 
@@ -135,6 +148,7 @@ public class NotesFragment extends Fragment {
         if (requestCode == SAVE_ENTRY) {
             if (resultCode == Activity.RESULT_OK) {
                 onDataSetChanged();
+                // TODO: For a new note just add it
             }
         }
     }
