@@ -14,9 +14,6 @@ import com.ibm.watson.tone_analyzer.v3.model.ToneScore;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -28,8 +25,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
+import yw.main.babble.ui.NotesFragment;
+
 public class NoteActivity extends AppCompatActivity {
     EditText editText;
+    int fileNumber;
     String filename = "";
 
     IamAuthenticator authenticator;
@@ -46,10 +46,16 @@ public class NoteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         editText = findViewById(R.id.EditText);
-        File[] files = getFilesDir().listFiles();
-        int fileNumber = files.length + 1;
-        filename = "Note" + fileNumber + ".txt";
+        Intent intent = getIntent();
+        if (intent != null) {
+            fileNumber = intent.getIntExtra(NotesFragment.NOTE_INDEX, 0);
+        }
+        else {
+            File[] files = getFilesDir().listFiles();
+            fileNumber = files.length + 1;
+        }
 
+        filename = "Note" + fileNumber + ".txt";
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,9 +96,7 @@ public class NoteActivity extends AppCompatActivity {
                 // get a new file name to save
                 Save(filename);
                 // close the activity
-                // TODO: Start Activity for Result from Main
-                Intent myIntent = new Intent(NoteActivity.this, MainActivity.class);
-                NoteActivity.this.startActivity(myIntent);
+                finish();
             }
         });
         // set these strings better

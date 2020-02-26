@@ -7,9 +7,11 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 
 import yw.main.babble.FontDrawActivity;
 import yw.main.babble.MainActivity;
+import yw.main.babble.NoteActivity;
 import yw.main.babble.NotesAdapter;
 import yw.main.babble.NotesBuilder;
 import yw.main.babble.R;
@@ -30,6 +33,7 @@ public class NotesFragment extends Fragment {
     ArrayList<NotesBuilder> notesList = new ArrayList<>();
     private NotesAdapter nAdapter;
     private ListView listView;
+    public static final String NOTE_INDEX = "NOTE_INDEX";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,11 +52,24 @@ public class NotesFragment extends Fragment {
         nAdapter = new NotesAdapter(notesList, getActivity());
         listView.setAdapter(nAdapter);
 
+        // Get a more detailed view on any clicked item in the list
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView adapterView, View view, int position, long id) {
+                Intent intent;
+                intent = new Intent(getActivity(), NoteActivity.class);
+                // This will change once we have a real db
+                intent.putExtra(NOTE_INDEX, position + 1);
+
+//                startActivityForResult(intent, SAVE_ENTRY);
+                startActivity(intent);
+            }
+        });
+
         ((Button) root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(getActivity(), FontDrawActivity.class);
-                getActivity().startActivity(myIntent);
+                startActivity(myIntent);
             }
         });
 
