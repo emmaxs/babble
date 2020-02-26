@@ -7,43 +7,34 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.media.ThumbnailUtils;
-import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Map;
-
 public class DrawingView extends View {
     private Paint mPaint;
-    private float px, py;
-    private float buttonDrawerHeight = 0.1f;
-    private float backButtonWidth = 0.2f;
-    private float clearButtonWidth = 0.3f;
-    private float saveButtonWidth = 0.3f;
-    private float nextButtonWidth = 0.2f;
-    private static final int DRAW_AREA = 0;
-    private static final int BACK_AREA = 1;
-    private static final int CLEAR_AREA = 2;
-    private static final int SAVE_AREA = 3;
-    private static final int NEXT_AREA = 4;
     private Bitmap mBitmap;
     private Canvas mCanvas;
     private Path mPath;
     private Paint mBitmapPaint;
-    private int startBtnPressLoc = -1;
     Context context;
     private Paint circlePaint;
     private Path circlePath;
+    private float mX, mY;
+    private static final float TOUCH_TOLERANCE = 4;
 
-    public DrawingView(Context c, Paint paint) {
+    public DrawingView(Context c) {
         super(c);
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setDither(true);
+        mPaint.setColor(Color.BLACK);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        mPaint.setStrokeWidth(100);
         context=c;
         mPath = new Path();
-        this.mPaint = paint;
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         circlePaint = new Paint();
         circlePath = new Path();
@@ -61,21 +52,8 @@ public class DrawingView extends View {
 
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
-        drawButtons();
     }
 
-    private void drawButtons() {
-        Paint btnPaint = new Paint();
-        btnPaint.setAntiAlias(true);
-        btnPaint.setColor(Color.RED);
-        mCanvas.drawRect(0, getHeight()*(1-buttonDrawerHeight), backButtonWidth*getWidth(), getHeight(), btnPaint);
-        btnPaint.setColor(Color.MAGENTA);
-        mCanvas.drawRect(backButtonWidth*getWidth(), getHeight()*(1-buttonDrawerHeight), (backButtonWidth+clearButtonWidth)*getWidth(), getHeight(), btnPaint);
-        btnPaint.setColor(Color.BLUE);
-        mCanvas.drawRect((backButtonWidth+clearButtonWidth)*getWidth(), getHeight()*(1-buttonDrawerHeight), (backButtonWidth+clearButtonWidth+saveButtonWidth)*getWidth(), getHeight(), btnPaint);
-        btnPaint.setColor(Color.GREEN);
-        mCanvas.drawRect(getWidth()*(1-nextButtonWidth),getHeight()*(1-buttonDrawerHeight), getWidth(), getHeight(), btnPaint);
-    }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -85,8 +63,7 @@ public class DrawingView extends View {
         canvas.drawPath( circlePath,  circlePaint);
     }
 
-    private float mX, mY;
-    private static final float TOUCH_TOLERANCE = 4;
+
 
     private void touch_start(float x, float y) {
         mPath.reset();
@@ -133,141 +110,44 @@ public class DrawingView extends View {
                 handleUp(x, y);
                 break;
         }
-        px = x;
-        py = y;
         return true;
     }
 
     private void handleDown(float x, float y) {
-        switch(checkArea(x, y)) {
-            case DRAW_AREA:
-                touch_start(x, y);
-                invalidate();
-                break;
-            case BACK_AREA:
-            case CLEAR_AREA:
-            case SAVE_AREA:
-            case NEXT_AREA:
-                startBtnPressLoc = checkArea(x, y);
-                break;
-        }
-
-    }
-
-    private int checkArea(float x, float y) {
-        if(y < (1-buttonDrawerHeight)*getHeight())
-            return DRAW_AREA;
-        if(x < getWidth() * backButtonWidth)
-            return BACK_AREA;
-        if(x < getWidth() * (clearButtonWidth + backButtonWidth))
-            return CLEAR_AREA;
-        if(x < getWidth() * (clearButtonWidth + backButtonWidth + saveButtonWidth))
-            return SAVE_AREA;
-        return NEXT_AREA;
+        touch_start(x, y);
+        invalidate();
     }
 
     private void handleMove(float x, float y) {
-        if(checkArea(x, y) != DRAW_AREA && checkArea(px, py) == DRAW_AREA) {
-            touch_up();
-        } else if (checkArea(x, y) == DRAW_AREA && checkArea(px, py) != DRAW_AREA) {
-            touch_start(x, y);
-        }
-        switch(checkArea(x, y)) {
-            case DRAW_AREA:
-                touch_move(x, y);
-                invalidate();
-                break;
-            case BACK_AREA:
-                break;
-            case CLEAR_AREA:
-                break;
-            case SAVE_AREA:
-                break;
-            case NEXT_AREA:
-                break;
-        }
-
+        touch_move(x, y);
+        invalidate();
     }
 
     private void handleUp(float x, float y) {
-        switch(checkArea(x, y)) {
-            case DRAW_AREA:
-                touch_up();
-                invalidate();
-                break;
-            case BACK_AREA:
-                if(startBtnPressLoc == BACK_AREA) {
-                    back();
-                }
-                break;
-            case CLEAR_AREA:
-                if(startBtnPressLoc == CLEAR_AREA) {
-                    clear();
-                }
-                break;
-            case SAVE_AREA:
-                if(startBtnPressLoc == SAVE_AREA) {
-                    save();
-                }
-                break;
-            case NEXT_AREA:
-                if(startBtnPressLoc == NEXT_AREA){
-                    next();
-                }
-                break;
+        touch_up();
+        invalidate();
+    }
+
+    public Bitmap getBitmap() {
+        Bitmap drawing = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(drawing);
+        this.draw(canvas);
+        int width = drawing.getWidth();
+        int height = drawing.getHeight();
+        int[] pixels = new int[width*height];
+        drawing.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for(int x = 0; x < pixels.length; x++) {
+            if(pixels[x] == Color.WHITE) pixels[x] = 0;
         }
+        return Bitmap.createScaledBitmap(Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888), Glyphs.CHAR_BITMAP_WIDTH, Glyphs.CHAR_BITMAP_HEIGHT, false);
     }
 
-    private void next() {
-        Log.d("button","next");
-    }
-
-    private void save() {
-        Log.d("button","save");
-        Bitmap drawing = getDrawingCache();
-        drawing = ThumbnailUtils.extractThumbnail(drawing, 256, 256);
-        SaveBitmapAsyncTask task = new SaveBitmapAsyncTask();
-        task.execute(new BitmapAndChar(drawing, 'a'));
-    }
-
-    private void clear() {
-        Log.d("button","clear");
+    public void clear() {
         setDrawingCacheEnabled(false);
         onSizeChanged(getWidth(), getHeight(), getWidth(), getHeight());
         invalidate();
         setDrawingCacheEnabled(true);
     }
 
-    private void back() {
-        Log.d("button","back");
-    }
-
-    private class SaveBitmapAsyncTask extends AsyncTask<BitmapAndChar, Void, Void> {
-        @Override
-        protected Void doInBackground(BitmapAndChar... bitmaps) {
-            //TODO: write bitmap to file with some sorta name like "font_<bitmaps[0].getChar()>.bmp"
-            return null;
-        }
-    }
-
-    private class BitmapAndChar {
-        private Bitmap bitmap;
-        private char aChar;
-        public BitmapAndChar(Bitmap bp, char c) {
-            bitmap = bp;
-            aChar = c;
-        }
-        public Bitmap getBitmap() {
-            return bitmap;
-        }
-        public void setBitmap(Bitmap bitmap) {
-            this.bitmap = bitmap;
-        }
-        public char getaChar() {
-            return aChar;
-        }
-        public void setaChar(char aChar) {
-            this.aChar = aChar;
-        }
-    }
 }
