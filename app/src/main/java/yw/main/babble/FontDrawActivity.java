@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -19,7 +20,6 @@ import yw.main.babble.font.DrawingView;
 import yw.main.babble.font.Glyphs;
 
 public class FontDrawActivity extends Activity {
-    private static final int PERMISSIONS_REQUEST = 1;
     private BitmapBuilderAndSaver builderAndSaver = new BitmapBuilderAndSaver();
     private DrawingView dv ;
     private TextView letterHint;
@@ -28,7 +28,6 @@ public class FontDrawActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_font_draw);
-        checkPermissions();
         builderAndSaver.loadBitmap(this);
         dv = new DrawingView(this);
         ((FrameLayout) findViewById(R.id.font_draw_frame_layout)).addView(dv);
@@ -60,30 +59,14 @@ public class FontDrawActivity extends Activity {
         updateHint();
     }
 
-    private void checkPermissions() {
 
-        if(ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-        || ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST);
-        }
-    }
 
 
     private void updateHint() {
         letterHint.setText("Please write character " + Glyphs.ALL_GLYPHS[currCharIndex]);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST:
-                break;
 
-        }
-    }
 
     private void nextLetter() {
         currCharIndex++;
@@ -91,6 +74,8 @@ public class FontDrawActivity extends Activity {
         updateHint();
         saveDrawing();
         dv.clear();
+        Log.d("nextLetter()", "" + Glyphs.ALL_GLYPHS[currCharIndex]);
+        dv.setImage(builderAndSaver.getGlyph(Glyphs.ALL_GLYPHS[currCharIndex]));
     }
 
     private void saveDrawing() {
@@ -105,6 +90,7 @@ public class FontDrawActivity extends Activity {
         updateHint();
         saveDrawing();
         dv.clear();
+        dv.setImage(builderAndSaver.getGlyph(Glyphs.ALL_GLYPHS[currCharIndex]));
     }
 
 }
