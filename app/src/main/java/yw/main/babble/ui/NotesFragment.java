@@ -134,13 +134,16 @@ public class NotesFragment extends Fragment {
         });
 
         // Font Draw button
-        (root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
+        // (root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
+
+        /*(root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
+>>>>>>> Stashed changes
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(getActivity(), FontDrawActivity.class);
                 startActivity(myIntent);
             }
-        });
+        });*/
 
         return root;
     }

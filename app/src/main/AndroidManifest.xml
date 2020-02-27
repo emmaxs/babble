@@ -35,5 +35,4 @@
             android:label="@string/title_activity_note_select"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
-
 </manifest>

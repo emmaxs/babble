@@ -2,11 +2,18 @@ package yw.main.babble;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.ibm.cloud.sdk.core.security.IamAuthenticator;
 import com.ibm.watson.tone_analyzer.v3.ToneAnalyzer;
 import com.ibm.watson.tone_analyzer.v3.model.ToneAnalysis;
@@ -19,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -36,6 +44,15 @@ import java.util.List;
 
 import yw.main.babble.ui.NotesFragment;
 
+/*// Pause the upload
+uploadTask.pause();
+
+// Resume the upload
+        uploadTask.resume();
+
+// Cancel the upload
+        uploadTask.cancel();*/
+
 public class NoteActivity extends AppCompatActivity {
     EditText editText;
     int fileNumber;
@@ -51,9 +68,11 @@ public class NoteActivity extends AppCompatActivity {
     // firebase
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
-    private DatabaseReference database;
+    private FirebaseStorage database;
     private String userId;
+    private StorageReference storageReference;
 
+    private String emotions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +91,23 @@ public class NoteActivity extends AppCompatActivity {
             fileNumber = files.length + 1;
         }
 
+
+        // firebase things (we know there wil be a current user since you must be
+        // logged in to get to this page
+
+        // store everyhing to firebase unless you can't
+        database = FirebaseStorage.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
+        // Create a storage reference from our app
+        storageReference = database.getReference();
+
+        userId = firebaseUser.getUid();
+
         filename = "Note" + fileNumber + ".txt";
         FloatingActionButton fab = findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,6 +133,9 @@ public class NoteActivity extends AppCompatActivity {
                                         "The following emotions were detected:\n\n"
                                                 + detectedTones.toUpperCase();
 
+                                // need to be able to access these when storing to firebase
+                                emotions = detectedTones;
+
                                 // Run the toast on UI
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -110,6 +147,46 @@ public class NoteActivity extends AppCompatActivity {
                     }
                 });
 
+                Uri file = Uri.fromFile(new File("files/"+filename));
+                StorageReference noteRef = storageReference.child("files/"+filename);
+                UploadTask uploadTask = noteRef.putFile(file);
+
+                // from firebase console
+                // Register observers to listen for when the download is done or if it fails
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                        // ...
+                        Toast.makeText(getBaseContext(), "Note saved to Firebase!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                // add emotions to the file metadata
+                StorageMetadata metadata = new StorageMetadata.Builder()
+                        .setContentType("files/txt")
+                        .setCustomMetadata("emotion", emotions)
+                        .build();
+
+                noteRef.updateMetadata(metadata)
+                        .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                            @Override
+                            public void onSuccess(StorageMetadata storageMetadata) {
+                                // Updated metadata is in storageMetadata
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Uh-oh, an error occurred!
+                            }
+                        });
+
                 // get a new file name to save
                 Save(filename);
                 setResult(Activity.RESULT_OK, intent);
@@ -119,12 +196,6 @@ public class NoteActivity extends AppCompatActivity {
         });
         // set these strings better
         editText.setText(Open(filename));
-
-        // firebase things (we know there wil be a current user since you must be
-        // logged in to get to this page
-        database = FirebaseDatabase.getInstance().getReference();
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
 
         // Sentiment analysis
         authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
