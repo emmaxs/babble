@@ -62,4 +62,15 @@ public class NotesAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return position;
     }
+
+    public void remove(int position) {
+        notesList.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public void addEntry(NotesBuilder note) {
+        notesList.add(note);
+        notifyDataSetChanged();
+    }
+
 }
