@@ -3,11 +3,14 @@ package yw.main.babble.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.BufferedReader;
@@ -35,13 +42,18 @@ import yw.main.babble.R;
 public class NotesFragment extends Fragment {
     ArrayList<NotesBuilder> notesList = new ArrayList<>();
     private NotesAdapter nAdapter;
-    private ListView listView;
+    private SwipeMenuListView listView;
     public static final String NOTE_INDEX = "NOTE_INDEX";
     public static final int SAVE_ENTRY = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     @Override
@@ -62,8 +74,53 @@ public class NotesFragment extends Fragment {
 
         listView = root.findViewById(R.id.notes);
 
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+            @Override
+            public void create(SwipeMenu menu) {
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(
+                        getActivity().getApplicationContext());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                        0x3F, 0x25)));
+                // set item width
+                deleteItem.setWidth(dpToPx(120));
+                // set a icon
+                deleteItem.setIcon(android.R.drawable.ic_delete);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+
+        // set creator
+        listView.setMenuCreator(creator);
+        listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        // do the notes list
+        prepareNotes();
+
+        // set adapter
         nAdapter = new NotesAdapter(notesList, getActivity());
         listView.setAdapter(nAdapter);
+
+        // set listener for swipe actions
+        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                        // delete - TODO: Right now we click on note
+                        Intent intent;
+                        intent = new Intent(getActivity(), NoteActivity.class);
+                        // This will change once we have a real db
+                        intent.putExtra(NOTE_INDEX, position);
+                        startActivityForResult(intent, SAVE_ENTRY);
+                        break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
+            }
+        });
 
         // Get a more detailed view on any clicked item in the list
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -76,6 +133,7 @@ public class NotesFragment extends Fragment {
             }
         });
 
+        // Font Draw button
         (root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,8 +141,6 @@ public class NotesFragment extends Fragment {
                 startActivity(myIntent);
             }
         });
-
-        prepareNotes();
 
         return root;
     }
