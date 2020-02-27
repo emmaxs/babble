@@ -10,12 +10,12 @@
             android:title="@string/menu_notes" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Explore">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/nav_map"
                 android:icon="@drawable/ic_menu_share"
-                android:title="@string/menu_share" />
+                android:title="@string/menu_map" />
         </menu>
     </item>
 

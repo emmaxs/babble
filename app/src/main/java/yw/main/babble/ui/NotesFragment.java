@@ -1,11 +1,9 @@
 package yw.main.babble.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
@@ -32,11 +29,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import yw.main.babble.FontDrawActivity;
-import yw.main.babble.MainActivity;
-import yw.main.babble.NoteActivity;
-import yw.main.babble.NotesAdapter;
-import yw.main.babble.NotesBuilder;
+import yw.main.babble.font.FontDrawActivity;
+import yw.main.babble.notes.NoteActivity;
+import yw.main.babble.notes.NotesAdapter;
+import yw.main.babble.notes.NotesBuilder;
 import yw.main.babble.R;
 
 public class NotesFragment extends Fragment {

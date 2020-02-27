@@ -19,9 +19,9 @@
     <string name="nav_header_desc">Navigation header</string>
 
     <string name="menu_notes">Notes</string>
-    <string name="menu_share">Share</string>
+    <string name="menu_map">Map</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="font_draw_button">Open Font Draw</string>
+    <string name="ar_button">See the Emotions Around You</string>
+    <string name="plane_finding">Searching for surfaces&#8230;</string>
 </resources>
