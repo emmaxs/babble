@@ -23,7 +23,8 @@ public class DrawingView extends View {
     private Path circlePath;
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
-    private boolean isFirstViewed = true;
+//    private boolean isFirstViewed = true;
+
     public DrawingView(Context c) {
         super(c);
         mPaint = new Paint();

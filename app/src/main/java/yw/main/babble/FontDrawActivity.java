@@ -26,6 +26,12 @@ public class FontDrawActivity extends Activity {
         setContentView(R.layout.activity_font_draw);
         builderAndSaver.loadBitmap(this);
         dv = new DrawingView(this);
+        dv.post(new Runnable() {
+            @Override
+            public void run() {
+                dv.setImage(builderAndSaver.getGlyph(Glyphs.ALL_GLYPHS[currCharIndex]));
+            }
+        });
         ((FrameLayout) findViewById(R.id.font_draw_frame_layout)).addView(dv);
         ((Button) findViewById(R.id.button_clearDrawing)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,7 +42,7 @@ public class FontDrawActivity extends Activity {
         ((Button) findViewById(R.id.button_backLetter)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                backDrawing();
+                prevLetter();
             }
         });
         ((Button) findViewById(R.id.button_saveDrawing)).setOnClickListener(new View.OnClickListener() {
@@ -61,6 +67,11 @@ public class FontDrawActivity extends Activity {
         saveFont();
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
     private void updateHint() {
         letterHint.setText("Please write character " + Glyphs.ALL_GLYPHS[currCharIndex]);
     }
@@ -82,7 +93,7 @@ public class FontDrawActivity extends Activity {
         builderAndSaver.putGlyph(dv.getBitmap(), Glyphs.ALL_GLYPHS[currCharIndex]);
     }
 
-    private void backDrawing() {
+    private void prevLetter() {
         saveGlyph();
         currCharIndex--;
         if(currCharIndex < 0) currCharIndex = 0;
