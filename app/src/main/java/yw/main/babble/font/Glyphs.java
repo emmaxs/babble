@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class Glyphs {
     private static final String TAG = Glyphs.class.getSimpleName();
-    public static final int CHAR_BITMAP_HEIGHT = 12;
-    public static final int CHAR_BITMAP_WIDTH = 8;
+    public static final int CHAR_BITMAP_HEIGHT = 180;
+    public static final int CHAR_BITMAP_WIDTH = 120;
     private Bitmap bitmap;
     private Map<Character, Bitmap> glyphs = new HashMap<Character, Bitmap>(62);
     public static final char[] CHARACTERS_L = new char[] {'a', 'b', 'c', 'd', 'e', 'f', 'g',

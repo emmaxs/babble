@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.media.ThumbnailUtils;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -113,6 +114,9 @@ public class DrawingView extends View {
         return true;
     }
 
+    public void setImage(Bitmap character) {
+        mCanvas.drawBitmap(character, null, new Rect(0, 0, getWidth(), getHeight()), mPaint);
+    }
     private void handleDown(float x, float y) {
         touch_start(x, y);
         invalidate();
