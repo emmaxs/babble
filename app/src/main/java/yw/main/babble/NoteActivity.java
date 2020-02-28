@@ -1,8 +1,11 @@
 package yw.main.babble;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -94,8 +97,6 @@ public class NoteActivity extends AppCompatActivity {
 
         // firebase things (we know there wil be a current user since you must be
         // logged in to get to this page
-
-        // store everyhing to firebase unless you can't
         database = FirebaseStorage.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -147,9 +148,60 @@ public class NoteActivity extends AppCompatActivity {
                     }
                 });
 
-                Uri file = Uri.fromFile(new File("files/"+filename));
-                StorageReference noteRef = storageReference.child("files/"+filename);
-                UploadTask uploadTask = noteRef.putFile(file);
+                // get a new file name to save (to firebase)
+                Save(filename);
+                setResult(Activity.RESULT_OK, intent);
+                // close the activity
+                finish();
+            }
+        });
+        // set these strings better
+        editText.setText(Open(filename));
+
+        // Sentiment analysis
+        authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
+        toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
+        toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
+    }
+
+    //TODO:
+    // Change function to work with firebase
+    public void Save(String fileName) {
+
+        // all files will exist locally, but not necessarily be shown by notesFragment
+        try {
+            OutputStreamWriter out =
+                    new OutputStreamWriter(openFileOutput(fileName, 0));
+            out.write(editText.getText().toString());
+            out.close();
+            Toast.makeText(this, "Note Saved!", Toast.LENGTH_SHORT).show();
+        } catch (Throwable t) {
+            Toast.makeText(this, "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
+        }
+
+        // saving to firebase if wifi is good
+        if(wifiConnection()){
+            if (FileExists(fileName)){
+                Uri file_to_upload = Uri.fromFile(new File(fileName));
+
+                // setting up hierarchy of files: eventually want /users/userID/Note.txt
+
+                // Create a child reference
+                // usersRef points to "users"
+                StorageReference usersRef = storageReference.child("users");
+
+                // Child references can also take paths
+                // userIDreft now points to "users/userID
+                // usersRef still points to "users"
+                StorageReference userIDref = usersRef.child(userId);
+
+                // usersRef = userIDref.getParent();
+
+                // StorageReference rootRef = userIDref.getRoot();
+
+                StorageReference noteRef = userIDref.child(fileName);
+                // database.getReference().child("users").child(userId).child(fileName).putFile(file_to_upload);
+                UploadTask uploadTask = noteRef.putFile(file_to_upload);
 
                 // from firebase console
                 // Register observers to listen for when the download is done or if it fails
@@ -157,6 +209,7 @@ public class NoteActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
+                        Toast.makeText(getBaseContext(), "Failed to save to Firebase...", Toast.LENGTH_SHORT).show();
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -178,43 +231,36 @@ public class NoteActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(StorageMetadata storageMetadata) {
                                 // Updated metadata is in storageMetadata
+                                Log.d("metadata", "Metadata stored successfully");
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception exception) {
                                 // Uh-oh, an error occurred!
+                                Log.d("metadata", "Error: metadata not stored.");
                             }
                         });
-
-                // get a new file name to save
-                Save(filename);
-                setResult(Activity.RESULT_OK, intent);
-                // close the activity
-                finish();
             }
-        });
-        // set these strings better
-        editText.setText(Open(filename));
+        }
 
-        // Sentiment analysis
-        authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
-        toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
-        toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
+
+        // TODO: if there are any notes stored locally but not in firebase, save them to firebase
+
     }
 
-    //TODO:
-
-    // Change function to work with firebase
-    public void Save(String fileName) {
-        try {
-            OutputStreamWriter out =
-                    new OutputStreamWriter(openFileOutput(fileName, 0));
-            out.write(editText.getText().toString());
-            out.close();
-            Toast.makeText(this, "Note Saved!", Toast.LENGTH_SHORT).show();
-        } catch (Throwable t) {
-            Toast.makeText(this, "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
+    // check wifi connection
+    private boolean wifiConnection() {
+        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
+            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+            if( wifiInfo.getNetworkId() == -1 ){
+                return false; // not connected to access point
+            }
+            return true; // connected to access point
+        }
+        else {
+            return false; // Wi-Fi is off
         }
     }
 
