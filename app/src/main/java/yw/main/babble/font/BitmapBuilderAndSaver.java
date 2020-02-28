@@ -17,6 +17,8 @@ public class BitmapBuilderAndSaver {
     public BitmapBuilderAndSaver() {
 
     }
+
+    // TODO: save font to firebase
     public boolean saveBitmap(Context context) {
         //TODO: FIX EACCES PERMISSION DENIED ERROR
         try {
@@ -29,7 +31,6 @@ public class BitmapBuilderAndSaver {
             return false;
         }
     }
-
 
     public void loadBitmap(Context context) {
         try {

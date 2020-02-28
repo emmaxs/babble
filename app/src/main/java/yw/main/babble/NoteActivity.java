@@ -3,6 +3,7 @@ package yw.main.babble;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -38,12 +39,19 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import yw.main.babble.ui.NotesFragment;
 
@@ -77,12 +85,21 @@ public class NoteActivity extends AppCompatActivity {
 
     private String emotions;
 
+    private SharedPreferences sharedPreferences;
+    // for app-wide shared prefs
+    public static final String myPrefs = "MyPrefs";
+    public static final String myMap = "Map";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // get app-wide shared prefs
+        sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
+
 
         editText = findViewById(R.id.EditText);
         intent = getIntent();
@@ -220,6 +237,7 @@ public class NoteActivity extends AppCompatActivity {
                     }
                 });
 
+                // TODO
                 // add emotions to the file metadata
                 StorageMetadata metadata = new StorageMetadata.Builder()
                         .setContentType("files/txt")
@@ -246,7 +264,72 @@ public class NoteActivity extends AppCompatActivity {
 
 
         // TODO: if there are any notes stored locally but not in firebase, save them to firebase
+        // queue of ids
+        // save on connect to wifi
 
+
+
+        // Here we need to create or update map, which links users to their text files
+        // this is used in notesFragment prepareNotes-- because we want to load files from local storage,
+        // we need to know which user is associated with which files in local
+        // if the user to files map exists, just need to update it
+        if(sharedPreferences.contains(myMap)){
+            Map<String, ArrayList<String>> inputMap = loadMapfromPreferences();
+
+            // either the user exists in the map or doesn't
+            if (inputMap.containsKey(userId)){
+                // just update the ArrayList
+                inputMap.get(userId).add(fileName);
+            }
+            else{
+                // add new arraylist with filename in
+                ArrayList<String> files = new ArrayList<String>();
+                files.add(fileName);
+                inputMap.put(userId, files);
+            }
+
+        }
+        // else, it means no file has been put in for any user yet
+        else{
+            Map<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
+            // since if the map exists, it means there are no files associated with this user, put the user in
+            ArrayList<String> files = new ArrayList<String>();
+            files.add(fileName);
+            map.put(userId, files);
+            saveMaptoPreferences(map);
+        }
+    }
+
+    public void saveMaptoPreferences(Map<String, ArrayList<String>> map){
+        // if the preferences aren't null, save the map object to the preferences
+        if (sharedPreferences != null){
+            JSONObject json = new JSONObject(map);
+            String jsonString = json.toString();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            // if the userid as key already exists in map, then update it. if not, create
+            editor.putString(myMap, jsonString);
+            editor.commit();
+        }
+    }
+
+    // specifically loads the user to files map!!
+    public Map<String, ArrayList<String>> loadMapfromPreferences(){
+        Map<String, ArrayList<String>> output = new HashMap<String, ArrayList<String>>();
+        try{
+            if(sharedPreferences != null){
+                String jsonString = sharedPreferences.getString(myMap, (new JSONObject()).toString());
+                JSONObject json = new JSONObject((jsonString));
+                Iterator<String> iterator = json.keys();
+                while(iterator.hasNext()){
+                    String string_key = iterator.next();
+                    ArrayList<String> string_array = (ArrayList<String>) json.get(string_key);
+                    output.put(string_key, string_array);
+                }
+            }
+        }
+        catch(Exception e){e.printStackTrace();}
+        return output;
     }
 
     // check wifi connection
