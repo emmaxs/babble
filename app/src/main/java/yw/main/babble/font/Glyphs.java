@@ -3,6 +3,7 @@ package yw.main.babble.font;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public class Glyphs {
             '_', '=', '+', '\\', '|', '\'', '"', '/', '<', '>', '~', '`'};
 
     public static final Map<Character, Point> CHAR_UPPER_LEFT;
+
     static {
         CHAR_UPPER_LEFT = new HashMap<>();
         for(int i = 0; i < 26; i++) {
@@ -50,6 +52,8 @@ public class Glyphs {
             CHAR_UPPER_LEFT.put(PUNCTUATION[i], new Point(i* CHAR_BITMAP_WIDTH, CHAR_BITMAP_HEIGHT *3));
         }
     }
+
+
     public Glyphs(Bitmap bitmap) {
         this.bitmap = bitmap;
         buildMap();
@@ -69,15 +73,26 @@ public class Glyphs {
             glyphs.put(PUNCTUATION[i], Bitmap.createBitmap(bitmap, i* CHAR_BITMAP_WIDTH, CHAR_BITMAP_HEIGHT *3, CHAR_BITMAP_WIDTH, CHAR_BITMAP_HEIGHT));
         }
     }
-    public void drawString(Canvas canvas, String text, int x, int y) {
+    public void drawString(Canvas canvas, String text, int x, int y,double size) {
         if(canvas == null) {
-            Log.d(TAG, "Canvas Is NUll");
+            Log.d(TAG, "Canvas Is Null");
         } else {
+            int textPosition = 0;
             for(int i = 0; i < text.length(); i++) {
                 Character ch = text.charAt(i);
-                if(glyphs.get(ch) != null) {
-                    canvas.drawBitmap(glyphs.get(ch), x + (i* CHAR_BITMAP_WIDTH), y, null);
+                if(ch.equals('\n')) {
+                    y+= CHAR_BITMAP_HEIGHT*size;
+                    textPosition = 0;
+                    continue;
                 }
+                if(glyphs.get(ch) != null) {
+//                    canvas.drawBitmap(glyphs.get(ch), x + (i* CHAR_BITMAP_WIDTH), y, null);
+                    canvas.drawBitmap(glyphs.get(ch), null, new Rect(
+                                    (int) (x+(textPosition*(CHAR_BITMAP_WIDTH*size))), y,
+                            (int) (x+((textPosition*(CHAR_BITMAP_WIDTH*size) + (CHAR_BITMAP_WIDTH*size)))), (int) (y+(CHAR_BITMAP_HEIGHT*size))),
+                            null);
+                }
+                textPosition++;
             }
         }
     }

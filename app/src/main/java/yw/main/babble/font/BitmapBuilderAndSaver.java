@@ -61,6 +61,7 @@ public class BitmapBuilderAndSaver {
         }
         bitmap = Bitmap.createBitmap(bigBoiPixels, bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
     }
+
     public Bitmap getGlyph(char letter) {
         Point upperLeft = Glyphs.CHAR_UPPER_LEFT.get(letter);
         int[] pixels = new int[Glyphs.CHAR_BITMAP_WIDTH*Glyphs.CHAR_BITMAP_HEIGHT];
@@ -73,6 +74,7 @@ public class BitmapBuilderAndSaver {
         }
         return Bitmap.createBitmap(pixels, Glyphs.CHAR_BITMAP_WIDTH, Glyphs.CHAR_BITMAP_HEIGHT, Bitmap.Config.ARGB_8888);
     }
+
     public Bitmap getBitmap() {
         return bitmap;
     }

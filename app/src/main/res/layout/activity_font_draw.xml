@@ -14,11 +14,6 @@
         android:layout_alignTop="@id/font_draw_frame_layout"
         android:textAlignment="center"
         android:textSize="20sp"/>
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/font_draw_image_view"
-        android:layout_above="@id/font_draw_frame_layout"/>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,19 +1,15 @@
 package yw.main.babble;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.pm.PackageManager;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import android.widget.Toast;
 
 import yw.main.babble.font.BitmapBuilderAndSaver;
 import yw.main.babble.font.DrawingView;
@@ -46,7 +42,7 @@ public class FontDrawActivity extends Activity {
         ((Button) findViewById(R.id.button_saveDrawing)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveDrawing();
+                saveGlyph();
             }
         });
         ((Button) findViewById(R.id.button_nextLetter)).setOnClickListener(new View.OnClickListener() {
@@ -59,8 +55,11 @@ public class FontDrawActivity extends Activity {
         updateHint();
     }
 
-
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveFont();
+    }
 
     private void updateHint() {
         letterHint.setText("Please write character " + Glyphs.ALL_GLYPHS[currCharIndex]);
@@ -69,28 +68,45 @@ public class FontDrawActivity extends Activity {
 
 
     private void nextLetter() {
+        saveGlyph();
         currCharIndex++;
         if(currCharIndex > Glyphs.ALL_GLYPHS.length-1) currCharIndex = Glyphs.ALL_GLYPHS.length-1;
+
         updateHint();
-        saveDrawing();
         dv.clear();
         Log.d("nextLetter()", "" + Glyphs.ALL_GLYPHS[currCharIndex]);
         dv.setImage(builderAndSaver.getGlyph(Glyphs.ALL_GLYPHS[currCharIndex]));
     }
 
-    private void saveDrawing() {
+    private void saveGlyph() {
         builderAndSaver.putGlyph(dv.getBitmap(), Glyphs.ALL_GLYPHS[currCharIndex]);
-        ((ImageView) findViewById(R.id.font_draw_image_view)).setImageBitmap(builderAndSaver.getBitmap());
-        builderAndSaver.saveBitmap(this);
     }
 
     private void backDrawing() {
+        saveGlyph();
         currCharIndex--;
         if(currCharIndex < 0) currCharIndex = 0;
         updateHint();
-        saveDrawing();
+
         dv.clear();
         dv.setImage(builderAndSaver.getGlyph(Glyphs.ALL_GLYPHS[currCharIndex]));
     }
 
+    private void saveFont() {
+        builderAndSaver.saveBitmap(this);
+    }
+
+    private class FontSaveTask extends AsyncTask<Context, Void, Context> {
+
+        @Override
+        protected Context doInBackground(Context... contexts) {
+            builderAndSaver.saveBitmap(contexts[0]);
+            return contexts[0];
+        }
+
+        @Override
+        protected void onPostExecute(Context aVoid) {
+            Toast.makeText(aVoid, "Font Saved Successfully!", Toast.LENGTH_SHORT);
+        }
+    }
 }

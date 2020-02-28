@@ -8,7 +8,7 @@
     tools:context=".NoteActivity"
     tools:showIn="@layout/activity_note">
 
-    <EditText
+    <yw.main.babble.font.CustomEditText
         android:id="@+id/EditText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

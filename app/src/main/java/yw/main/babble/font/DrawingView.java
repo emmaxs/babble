@@ -23,7 +23,7 @@ public class DrawingView extends View {
     private Path circlePath;
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
-
+    private boolean isFirstViewed = true;
     public DrawingView(Context c) {
         super(c);
         mPaint = new Paint();
@@ -50,7 +50,6 @@ public class DrawingView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
     }
@@ -58,7 +57,6 @@ public class DrawingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         canvas.drawBitmap( mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath( mPath,  this.mPaint);
         canvas.drawPath( circlePath,  circlePaint);
