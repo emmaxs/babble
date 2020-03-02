@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.SettingsFragment">
+
+    <PreferenceCategory android:title="@string/account_prefs">
+        <Preference
+            android:key="pref1"
+            android:title="@string/password_change">
+        </Preference>
+
+        <Preference
+            android:key="pref2"
+            android:title="@string/delete_account">
+        </Preference>
+
+        <Preference
+            android:key="pref3"
+            android:title="@string/log_out">
+        </Preference>
+       <!-- <CheckBoxPreference
+            android:key="checkbox_preference"
+            android:title="@string/title_privacy"
+            android:summary="@string/summary_privacy" />-->
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/visual_settings">
+        <Preference
+            android:key="pref4"
+            android:title="@string/font_draw">
+        </Preference>
+
+        <Preference
+            android:key="pref5"
+            android:title="@string/themes"
+            android:summary="@string/themes_summary">
+        </Preference>
+        <!--<ListPreference
+            android:title="@string/title_unit"
+            android:summary="@string/summary_unit"
+            android:key="unit_preference"
+            android:entries="@array/unit_options"
+            android:entryValues="@array/unit_options"
+            android:dialogTitle="@string/title_unit"
+            android:defaultValue="0" />-->
+    </PreferenceCategory>
+
+</PreferenceScreen>

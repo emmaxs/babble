@@ -22,6 +22,10 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,6 +46,13 @@ public class NotesFragment extends Fragment {
     public static final String NOTE_INDEX = "NOTE_INDEX";
     public static final int SAVE_ENTRY = 1;
 
+    // firebase
+    private FirebaseStorage database;
+    private StorageReference storageReference;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
+    private String userId;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +68,16 @@ public class NotesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_notes, container, false);
+
+        // set firebase things
+        database = FirebaseStorage.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
+        // Create a storage reference from our app
+        storageReference = database.getReference();
+
+        userId = firebaseUser.getUid();
 
         // TODO: Add Snackbar
         FloatingActionButton fab = root.findViewById(R.id.fab);
@@ -130,17 +151,22 @@ public class NotesFragment extends Fragment {
         });
 
         // Font Draw button
-        (root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
+        // (root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
+
+        /*(root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
+>>>>>>> Stashed changes
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(getActivity(), FontDrawActivity.class);
                 startActivity(myIntent);
             }
-        });
+        });*/
 
         return root;
     }
 
+
+    //TODO: modify for firebase
     private void prepareNotes() {
         File directory;
         directory = getActivity().getFilesDir();
@@ -148,7 +174,9 @@ public class NotesFragment extends Fragment {
         String theFile;
         Log.d("exs", "File length is " + files.length);
         for (int f = 1; f <= files.length; f++) {
+            // TODO: firebase here
             theFile = "Note" + f + ".txt";
+            StorageReference pathReference = storageReference.child("users/"+userId+"/"+theFile);
             NotesBuilder note = new NotesBuilder(theFile, Open(theFile));
             notesList.add(note);
         }

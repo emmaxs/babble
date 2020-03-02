@@ -9,7 +9,7 @@
         android:id="@+id/open_map_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/ar_button"
+        android:text="@string/map_button"
         android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
