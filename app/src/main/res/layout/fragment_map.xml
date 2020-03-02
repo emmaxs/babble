@@ -6,7 +6,7 @@
     tools:context=".ui.MapFragment">
 
     <Button
-        android:id="@+id/open_ar_activity_button"
+        android:id="@+id/open_map_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/ar_button"

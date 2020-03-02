@@ -10,16 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import yw.main.babble.MapsActivity;
 import yw.main.babble.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MapFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class MapFragment extends Fragment {
 
 
@@ -35,9 +28,11 @@ public class MapFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Maybe remove this button
-        (root.findViewById(R.id.open_ar_activity_button)).setOnClickListener(new Button.OnClickListener() {
+        (root.findViewById(R.id.open_map_button)).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), MapsActivity.class);
+                startActivity(intent);
             }
         });
 

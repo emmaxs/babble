@@ -24,4 +24,5 @@
     <string name="font_draw_button">Open Font Draw</string>
     <string name="ar_button">See the Emotions Around You</string>
     <string name="plane_finding">Searching for surfaces&#8230;</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
