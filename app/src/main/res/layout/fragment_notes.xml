@@ -5,12 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.NotesFragment">
-    <!--<Button
-        android:id="@+id/open_draw_activity_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/font_draw_button"
-        android:layout_alignParentBottom="true" />-->
 
     <com.baoyz.swipemenulistview.SwipeMenuListView
         android:id="@+id/notes"
@@ -18,8 +12,6 @@
         android:layout_height="fill_parent"
         android:layout_margin="8dp"
         android:layout_alignParentTop="true"/>
-        <!--android:layout_above="@id/open_draw_activity_button"--> >
->>>>>>> Stashed changes
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

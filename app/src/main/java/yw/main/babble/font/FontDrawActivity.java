@@ -1,4 +1,4 @@
-package yw.main.babble;
+package yw.main.babble.font;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import yw.main.babble.R;
 import yw.main.babble.font.BitmapBuilderAndSaver;
 import yw.main.babble.font.DrawingView;
 import yw.main.babble.font.Glyphs;
