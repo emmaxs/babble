@@ -71,9 +71,10 @@ public class NotesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences =  // get app-wide shared prefs
-                sharedPreferences = getActivity().getApplicationContext()
+        sharedPreferences = getActivity().getApplicationContext()
                         .getSharedPreferences(NoteActivity.myPrefs, Context.MODE_PRIVATE);
+
+        // get app-wide shared prefs
     }
 
     public int dpToPx(int dp) {
@@ -172,6 +173,7 @@ public class NotesFragment extends Fragment {
         return root;
     }
 
+
     private void prepareNotesfromFirebase(){
         // get everything stored under the users/userId directory
 
@@ -229,6 +231,7 @@ public class NotesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         // put the entries back in the adapter
         if (notesList != null) {
             nAdapter = new NotesAdapter(notesList, getActivity());
