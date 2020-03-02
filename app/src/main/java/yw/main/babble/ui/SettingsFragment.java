@@ -29,9 +29,9 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import yw.main.babble.FontDrawActivity;
 import yw.main.babble.LoginActivity;
 import yw.main.babble.R;
+import yw.main.babble.font.FontDrawActivity;
 
 /**
  * A simple {@link Fragment} subclass.

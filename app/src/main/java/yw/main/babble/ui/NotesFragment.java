@@ -77,7 +77,7 @@ public class NotesFragment extends Fragment {
         // Create a storage reference from our app
         storageReference = database.getReference();
 
-        userId = firebaseUser.getUid();
+//        userId = firebaseUser.getUid();
 
         // TODO: Add Snackbar
         FloatingActionButton fab = root.findViewById(R.id.fab);
@@ -149,18 +149,6 @@ public class NotesFragment extends Fragment {
                 startActivityForResult(intent, SAVE_ENTRY);
             }
         });
-
-        // Font Draw button
-        // (root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
-
-        /*(root.findViewById(R.id.open_draw_activity_button)).setOnClickListener(new Button.OnClickListener() {
->>>>>>> Stashed changes
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(getActivity(), FontDrawActivity.class);
-                startActivity(myIntent);
-            }
-        });*/
 
         return root;
     }
