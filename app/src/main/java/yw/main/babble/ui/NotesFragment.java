@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
@@ -42,11 +40,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import yw.main.babble.FontDrawActivity;
-import yw.main.babble.MainActivity;
-import yw.main.babble.NoteActivity;
-import yw.main.babble.NotesAdapter;
-import yw.main.babble.NotesBuilder;
+import yw.main.babble.font.FontDrawActivity;
+import yw.main.babble.notes.NoteActivity;
+import yw.main.babble.notes.NotesAdapter;
+import yw.main.babble.notes.NotesBuilder;
 import yw.main.babble.R;
 
 public class NotesFragment extends Fragment {
@@ -96,7 +93,7 @@ public class NotesFragment extends Fragment {
         // Create a storage reference from our app
         storageReference = database.getReference();
 
-        userId = firebaseUser.getUid();
+//        userId = firebaseUser.getUid();
 
         // TODO: Add Snackbar
         FloatingActionButton fab = root.findViewById(R.id.fab);
@@ -168,7 +165,6 @@ public class NotesFragment extends Fragment {
                 startActivityForResult(intent, SAVE_ENTRY);
             }
         });
-
 
         return root;
     }

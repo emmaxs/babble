@@ -1,4 +1,4 @@
-package yw.main.babble;
+package yw.main.babble.notes;
 
 import android.app.Activity;
 import android.content.Context;
@@ -53,6 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import yw.main.babble.R;
 import yw.main.babble.ui.NotesFragment;
 
 /*// Pause the upload

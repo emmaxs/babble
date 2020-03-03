@@ -13,7 +13,7 @@ Here is the pitch we presented in [class](https://docs.google.com/presentation/d
 Responsibilty to be determined: Location services and AR to see snippets of the sentiments being created around you.
 
 ### MVC/Threaded Diagram
-Here is a link to the MVC we presented during [Show and Tell 1](https://docs.google.com/presentation/d/1ejdROAu_Ms1Mu4eX_bIxM7x1S3fD2zbaiAfkCbGuQMg/edit?usp=sharing).
+Here is a link to the MVC and Threading Diagram we presented during [Show and Tell 1 & 2](https://docs.google.com/presentation/d/1ejdROAu_Ms1Mu4eX_bIxM7x1S3fD2zbaiAfkCbGuQMg/edit?usp=sharing).
 
 ### APK
 APK Release Date: March 6th, 2019. 
@@ -23,4 +23,7 @@ Coming soon.
 
 ### Source Code
 Coming soon. Note: Github repository is currently set to private.
+
+### Acknowlegements
+Used emojis from this [website](https://icons8.com/icon/pack/emoji/emoji).
 

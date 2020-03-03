@@ -9,7 +9,16 @@
             android:icon="@drawable/ic_shortcut_create"
             android:title="@string/menu_notes" />
     </group>
-
+    
+    <item android:title="Explore">
+        <menu>
+            <item
+                android:id="@+id/nav_map"
+                android:icon="@drawable/ic_menu_share"
+                android:title="@string/menu_map" />
+            </menu>
+    </item>
+            
     <item android:title="User Settings">
         <menu>
             <item

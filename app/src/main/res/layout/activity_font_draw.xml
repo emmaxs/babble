@@ -6,12 +6,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FontDrawActivity">
+    tools:context=".font.FontDrawActivity">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/letter_hint_text_view"
-        android:layout_alignTop="@id/font_draw_frame_layout"
         android:textAlignment="center"
         android:textSize="20sp"/>
     <FrameLayout
@@ -22,6 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:id="@+id/font_draw_linear_layout"
         android:layout_alignBottom="@id/font_draw_frame_layout"
         >
         <Button
