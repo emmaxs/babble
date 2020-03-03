@@ -1,12 +1,19 @@
 package yw.main.babble.notes;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -32,6 +39,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.View;
@@ -57,7 +66,7 @@ uploadTask.pause();
 // Cancel the upload
         uploadTask.cancel();*/
 
-public class NoteActivity extends AppCompatActivity {
+public class NoteActivity extends AppCompatActivity implements LocationListener {
     EditText editText;
     int fileNumber;
     String filename = "";
@@ -77,6 +86,11 @@ public class NoteActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private String emotions;
+    LocationManager locationManager;
+    private double currentLatitude;
+    private double currentLongitude;
+
+    private static final int PERMISSIONS_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,14 +140,17 @@ public class NoteActivity extends AppCompatActivity {
                         List<ToneScore> scores = toneAnalysis.getDocumentTone()
                                         .getTones();
                                 String detectedTones = "";
+                                double max = 0;
                                 for(ToneScore score:scores) {
-                                    if(score.getScore() > 0.5f) {
-                                        detectedTones += score.getToneName() + " ";
-                                    }
+                                   if (score.getScore() > max) {
+                                       max = score.getScore();
+                                       detectedTones = score.getToneName().toUpperCase();
+                                   }
                                 }
+
                                 toastMessage =
                                         "The following emotions were detected:\n\n"
-                                                + detectedTones.toUpperCase();
+                                                + detectedTones + "\n\nLat: " + currentLatitude + ", Long: " + currentLongitude;
 
                                 // need to be able to access these when storing to firebase
                                 emotions = detectedTones;
@@ -149,6 +166,7 @@ public class NoteActivity extends AppCompatActivity {
                     }
                 });
 
+                // Probably the entire async task should be saving
                 // get a new file name to save (to firebase)
                 Save(filename);
                 setResult(Activity.RESULT_OK, intent);
@@ -291,4 +309,55 @@ public class NoteActivity extends AppCompatActivity {
         }
         return content;
     }
+
+
+    private void initLocationManager(){
+        try {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            String provider = locationManager.getBestProvider(criteria, true);
+            // Log.d provider will print GPS
+            locationManager.requestLocationUpdates(provider, 0, 0, this);
+            Location location = locationManager.getLastKnownLocation(provider);
+            // One situation to use callback manually
+            onLocationChanged(location);
+        }
+        catch (SecurityException e) {}
+    }
+
+    public void onLocationChanged(Location location) {
+        if (location == null) return;
+        // location object gets you current latitude and long of phone
+        currentLatitude = location.getLatitude();
+        currentLongitude = location.getLongitude();
+    }
+
+    public void onDestroy(){
+        super.onDestroy();
+        if(locationManager != null)
+            locationManager.removeUpdates(this);
+    }
+
+    public void onProviderEnabled(String provider) {}
+    public void onProviderDisabled(String provider) {}
+    public void onStatusChanged(String provider, int status, Bundle bundle) {}
+
+    public void checkPermissions(){
+        if(Build.VERSION.SDK_INT < 23) return;
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST);
+        else
+            initLocationManager();
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(requestCode == PERMISSIONS_REQUEST){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                initLocationManager();
+        }
+    }
+
 }

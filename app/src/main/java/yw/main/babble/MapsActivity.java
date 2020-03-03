@@ -19,6 +19,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -32,6 +33,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker locationMarker;
     CameraUpdate cameraUpdate;
     public static final String ZOOM_STATUS = "zoom_status";
+
+    // EMOTION CONSTANTS
+    public static final String JOY = "JOY";
+    public static final String FEAR = "FEAR";
+    public static final String SADNESS = "SADNESS";
+    public static final String UNKNOWN = "UNKNOWN";
+    public static final String TENTATIVE = "TENTATIVE";
+    public static final String ANALYTICAL = "ANALYTICAL";
+    public static final String CONFIDENT = "CONFIDENT";
+    public static final String ANGER = "ANGER";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +149,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(requestCode == PERMISSIONS_REQUEST){
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 initLocationManager();
+        }
+    }
+
+    // Create a marker based on the emotion
+    public MarkerOptions createMarker(LatLng latLng, String emotion) {
+        switch (emotion) {
+            case JOY:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(JOY)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.joy));
+            case SADNESS:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(SADNESS)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.sadness));
+            case FEAR:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(FEAR)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.fear));
+            case ANGER:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(ANGER)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.anger));
+            case TENTATIVE:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(TENTATIVE)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.tentative));
+            case ANALYTICAL:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(ANALYTICAL)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.analytical));
+            case CONFIDENT:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(CONFIDENT)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.confident));
+                default:
+                    return new MarkerOptions()
+                            .position(latLng)
+                            .title(UNKNOWN)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.unknown));
         }
     }
 
