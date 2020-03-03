@@ -73,6 +73,7 @@ public class Glyphs {
             glyphs.put(PUNCTUATION[i], Bitmap.createBitmap(bitmap, i* CHAR_BITMAP_WIDTH, CHAR_BITMAP_HEIGHT *3, CHAR_BITMAP_WIDTH, CHAR_BITMAP_HEIGHT));
         }
     }
+
     public void drawString(Canvas canvas, String text, int x, int y,double size) {
         if(canvas == null) {
             Log.d(TAG, "Canvas Is Null");

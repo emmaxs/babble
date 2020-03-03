@@ -17,12 +17,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_margin="8dp"
-<<<<<<< Updated upstream
-        android:layout_above="@id/open_draw_activity_button" />
-=======
         android:layout_alignParentTop="true"/>
+        <!--android:layout_above="@id/open_draw_activity_button" -->
         <!--android:layout_above="@id/open_draw_activity_button"--> >
->>>>>>> Stashed changes
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
