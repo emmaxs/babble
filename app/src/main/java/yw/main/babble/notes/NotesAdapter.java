@@ -1,4 +1,4 @@
-package yw.main.babble;
+package yw.main.babble.notes;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 
 import java.util.ArrayList;
+
+import yw.main.babble.R;
 
 public class NotesAdapter extends BaseAdapter {
 

@@ -44,12 +44,19 @@ public class CustomEditText extends AppCompatEditText {
         super.draw(canvas);
         canvas.drawColor(Color.WHITE);
         int glyphPacking = (int) (getWidth() / (Glyphs.CHAR_BITMAP_WIDTH*TEXT_SIZE))-1;
-        String result = "";
-        String from = getText().toString();
-        for(int i = 0; i < result.length(); i+=glyphPacking) {
-
+        String result = getText().toString();
+        int counter = 0;
+        for(int i = 0; i < result.length(); i++) {
+            if(result.charAt(i) == '\n')
+                counter = 0;
+            if(counter == glyphPacking) {
+               result = result.substring(0, i) + "\n" + result.substring(i);
+               counter = 0;
+           }
+           counter++;
         }
-//        Log.d("draw()","glyphs " + glyphPacking);
-        glyphs.drawString(canvas, getText().toString(), 0, 0, TEXT_SIZE);
+
+        Log.d("draw()",result);
+        glyphs.drawString(canvas, result, 0, 0, TEXT_SIZE);
     }
 }
