@@ -40,10 +40,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import yw.main.babble.font.FontDrawActivity;
 import yw.main.babble.notes.NoteActivity;
 import yw.main.babble.notes.NotesAdapter;
 import yw.main.babble.notes.NotesBuilder;
+
+
 import yw.main.babble.R;
 
 public class NotesFragment extends Fragment {
@@ -93,7 +94,7 @@ public class NotesFragment extends Fragment {
         // Create a storage reference from our app
         storageReference = database.getReference();
 
-//        userId = firebaseUser.getUid();
+        userId = firebaseUser.getUid();
 
         // TODO: Add Snackbar
         FloatingActionButton fab = root.findViewById(R.id.fab);
@@ -170,6 +171,7 @@ public class NotesFragment extends Fragment {
     }
 
 
+    // asynctask
     private void prepareNotesfromFirebase(){
         // get everything stored under the users/userId directory
 

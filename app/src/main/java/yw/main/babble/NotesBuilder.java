@@ -1,4 +1,4 @@
-package yw.main.babble.notes;
+package yw.main.babble;
 
 public class NotesBuilder {
 

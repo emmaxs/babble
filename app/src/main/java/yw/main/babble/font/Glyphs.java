@@ -85,6 +85,7 @@ public class Glyphs {
      * @param y Y position of upper left corner of text
      * @param size Font size - generally 0<size<=1.
      */
+
     public void drawString(Canvas canvas, String text, int x, int y,double size) {
         if(canvas == null) {
             Log.d(TAG, "Canvas Is Null");
