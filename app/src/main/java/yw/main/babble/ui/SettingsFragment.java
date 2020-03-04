@@ -62,7 +62,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             public boolean onPreferenceClick(Preference preference) {
 
                 // TODO: try dialog fragment
-                makeAlertDialog();
+                // makeAlertDialog();
                 firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
                 // need to reauthenticate -- only need user to input password
@@ -70,7 +70,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
                 //
                 AuthCredential authCredential = EmailAuthProvider
-                        .getCredential(email, password_old);
+                        .getCredential(email, "password");
 
                 // now must reauthenticate
                 firebaseUser.reauthenticate(authCredential)
@@ -103,6 +103,47 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 // TODO
+                // make alert dialog, on ok click delete account
+
+                /*AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Theme_AppCompat_Dialog_Alert);
+                builder.setTitle("Are you sure you want to delete your Babble account?");
+
+                builder.setPositiveButton("YES",new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // delete user
+                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        AuthCredential credential = EmailAuthProvider
+                                .getCredential("", "");
+
+                        // Prompt the user to re-provide their sign-in credentials
+                        user.reauthenticate(credential)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        user.delete()
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Log.d("tag", "account deleted");
+                                                        }
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                });
+
+                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();*/
                 return true;
             }
         });
