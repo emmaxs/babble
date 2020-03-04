@@ -3,6 +3,7 @@ package yw.main.babble.notes;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -58,6 +59,7 @@ public class NoteActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String userId;
 
+    SharedPreferences sharedPreferences;
     private String detectedTone;
 
     // for app-wide shared prefs
@@ -71,6 +73,11 @@ public class NoteActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //TODO: switch theme
+        setTheme(R.style.JournalTheme);
+
+        // get app-wide shared prefs
+        sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
 
         editText = findViewById(R.id.EditText);
         intent = getIntent();
@@ -145,6 +152,11 @@ public class NoteActivity extends AppCompatActivity {
         authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
         toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
         toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
+    }
+
+    public void onResume(){
+        super.onResume();
+        //TODO: change theme (use sharedprefs)
     }
 
     public void Save(String fileName) {
