@@ -20,35 +20,51 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:id="@+id/font_draw_linear_layout"
-        android:layout_alignBottom="@id/font_draw_frame_layout"
-        >
-        <Button
+        android:layout_alignBottom="@id/font_draw_frame_layout">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button_backLetter"
-            android:text="Back"
-            android:layout_weight="1"/>
-        <Button
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_brush_size"
+                android:text="Brush Size"
+                android:layout_weight="1"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_clearDrawing"
+                android:text="Clear"
+                android:layout_weight="1"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_brush_color"
+                android:text="Brush Color"
+                android:layout_weight="1"/>
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button_clearDrawing"
-            android:text="Clear"
-            android:layout_weight="1"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_saveDrawing"
-            android:text="Save"
-            android:layout_weight="1"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_nextLetter"
-            android:text="Next"
-            android:layout_weight="1"/>
-
-
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            >
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_backLetter"
+                android:text="Back"
+                android:layout_weight="1"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_nextLetter"
+                android:text="Next"
+                android:layout_weight="1"/>
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

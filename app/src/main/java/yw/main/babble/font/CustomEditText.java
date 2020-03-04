@@ -3,13 +3,14 @@ package yw.main.babble.font;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
 public class CustomEditText extends AppCompatEditText {
-    private static final double TEXT_SIZE = .5;
+    private static final double TEXT_SIZE = .3;
     private Glyphs glyphs;
     private BitmapBuilderAndSaver builderAndSaver;
     public CustomEditText(Context context) {
@@ -31,6 +32,10 @@ public class CustomEditText extends AppCompatEditText {
         builderAndSaver = new BitmapBuilderAndSaver();
         builderAndSaver.loadBitmap(getContext());
         glyphs = new Glyphs(builderAndSaver.getBitmap());
+        setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+        setTextSize(26f);
+        setLineSpacing(0, .8f);
+        setTextColor(Color.WHITE);
     }
 
     @Override
@@ -42,7 +47,7 @@ public class CustomEditText extends AppCompatEditText {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawColor(Color.WHITE);
+//        canvas.drawColor(Color.WHITE);
         int glyphPacking = (int) (getWidth() / (Glyphs.CHAR_BITMAP_WIDTH*TEXT_SIZE))-1;
         String result = getText().toString();
         int counter = 0;
@@ -50,13 +55,20 @@ public class CustomEditText extends AppCompatEditText {
             if(result.charAt(i) == '\n')
                 counter = 0;
             if(counter == glyphPacking) {
-               result = result.substring(0, i) + "\n" + result.substring(i);
-               counter = 0;
-           }
-           counter++;
+                if(result.charAt(i) != ' ') {
+                    if(result.lastIndexOf(' ') == -1)
+                        result = result.substring(0, i) + "\n" + result.substring(i);
+                    else
+                        result = result.substring(0, result.substring(0, i).lastIndexOf(' ')) + "\n" + result.substring(result.substring(0, i).lastIndexOf(' ')+1);
+                } else {
+                    result = result.substring(0, i) + "\n" + result.substring(i+1);
+                }
+                counter = 0;
+            }
+            counter++;
         }
 
         Log.d("draw()",result);
-        glyphs.drawString(canvas, result, 0, 0, TEXT_SIZE);
+        glyphs.drawString(canvas, result, 10, 30, TEXT_SIZE);
     }
 }

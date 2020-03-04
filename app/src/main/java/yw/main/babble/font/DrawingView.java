@@ -19,8 +19,6 @@ public class DrawingView extends View {
     private Path mPath;
     private Paint mBitmapPaint;
     Context context;
-    private Paint circlePaint;
-    private Path circlePath;
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
 //    private boolean isFirstViewed = true;
@@ -38,13 +36,7 @@ public class DrawingView extends View {
         context=c;
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-        circlePaint = new Paint();
-        circlePath = new Path();
-        circlePaint.setAntiAlias(true);
-        circlePaint.setColor(Color.BLUE);
-        circlePaint.setStyle(Paint.Style.STROKE);
-        circlePaint.setStrokeJoin(Paint.Join.MITER);
-        circlePaint.setStrokeWidth(4f);
+
 
     }
 
@@ -60,7 +52,6 @@ public class DrawingView extends View {
         super.onDraw(canvas);
         canvas.drawBitmap( mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath( mPath,  this.mPaint);
-        canvas.drawPath( circlePath,  circlePaint);
     }
 
 
@@ -79,15 +70,11 @@ public class DrawingView extends View {
             mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
             mX = x;
             mY = y;
-
-            circlePath.reset();
-            circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
         }
     }
 
     private void touch_up() {
         mPath.lineTo(mX, mY);
-        circlePath.reset();
         // commit the path to our offscreen
         mCanvas.drawPath(mPath,  this.mPaint);
         // kill this so we don't double draw
@@ -131,6 +118,14 @@ public class DrawingView extends View {
         invalidate();
     }
 
+    public void setStrokeColor(int color) {
+        if(color == Color.WHITE) return;
+        mPaint.setColor(color);
+    }
+
+    public void setStrokeSize(int size) {
+        mPaint.setStrokeWidth(size);
+    }
     public Bitmap getBitmap() {
         Bitmap drawing = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(drawing);
