@@ -93,7 +93,7 @@ public class NotesFragment extends Fragment {
         // Create a storage reference from our app
         storageReference = database.getReference();
 
-//        userId = firebaseUser.getUid();
+        userId = firebaseUser.getUid();
 
         // TODO: Add Snackbar
         FloatingActionButton fab = root.findViewById(R.id.fab);
@@ -130,7 +130,7 @@ public class NotesFragment extends Fragment {
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
 
         // do the notes list
-        prepareNotes();
+//        prepareNotes();
 
         // set adapter
         nAdapter = new NotesAdapter(notesList, getActivity());
@@ -172,8 +172,8 @@ public class NotesFragment extends Fragment {
 
     private void prepareNotesfromFirebase(){
         // get everything stored under the users/userId directory
+         StorageReference notesRef = storageReference.child("notes");
 
-        // StorageReference pathReference = storageReference.child("users/"+userId+"/"+theFile);
     }
 
     //TODO: modify for firebase
@@ -187,19 +187,19 @@ public class NotesFragment extends Fragment {
     // DO NOT USE WHEN FIRST LOGGING IN
     // first log in must pull from firebase.
 
-    private void prepareNotes() {
-        // get the user to files map
-        Map<String, ArrayList<String>> user_to_files = loadMapfromPreferences();
-
-        // now take every filename associated with userId string and display it
-        // only display notes if the user has files associated (if statement)
-        if(user_to_files.containsKey(userId)){
-            for (String filename: user_to_files.get(userId)){
-                NotesBuilder note = new NotesBuilder(filename, Open(filename));
-                notesList.add(note);
-            }
-        }
-    }
+//    private void prepareNotes() {
+//        // get the user to files map
+//        Map<String, ArrayList<String>> user_to_files = loadMapfromPreferences();
+//
+//        // now take every filename associated with userId string and display it
+//        // only display notes if the user has files associated (if statement)
+//        if(user_to_files.containsKey(userId)){
+//            for (String filename: user_to_files.get(userId)){
+//                NotesBuilder note = new NotesBuilder(filename, Open(filename));
+//                notesList.add(note);
+//            }
+//        }
+//    }
 
     // old version
    /* private void prepareNotes(){
@@ -219,7 +219,7 @@ public class NotesFragment extends Fragment {
 
     public void onDataSetChanged() {
         notesList.clear();
-        prepareNotes();
+//        prepareNotes();
         nAdapter.notifyDataSetChanged();
     }
 
@@ -283,22 +283,22 @@ public class NotesFragment extends Fragment {
     }
 
     // specifically loads the user to files map!!
-    public Map<String, ArrayList<String>> loadMapfromPreferences(){
-        Map<String, ArrayList<String>> output = new HashMap<String, ArrayList<String>>();
-        try{
-            if(sharedPreferences != null){
-                String jsonString = sharedPreferences.getString(NoteActivity.myMap, (new JSONObject()).toString());
-                JSONObject json = new JSONObject((jsonString));
-                Iterator<String> iterator = json.keys();
-                while(iterator.hasNext()){
-                    String string_key = iterator.next();
-                    ArrayList<String> string_array = (ArrayList<String>) json.get(string_key);
-                    output.put(string_key, string_array);
-                }
-            }
-        }
-        catch(Exception e){e.printStackTrace();}
-        return output;
-    }
+//    public Map<String, ArrayList<String>> loadMapfromPreferences(){
+//        Map<String, ArrayList<String>> output = new HashMap<String, ArrayList<String>>();
+//        try{
+//            if(sharedPreferences != null){
+//                String jsonString = sharedPreferences.getString(NoteActivity.myMap, (new JSONObject()).toString());
+//                JSONObject json = new JSONObject((jsonString));
+//                Iterator<String> iterator = json.keys();
+//                while(iterator.hasNext()){
+//                    String string_key = iterator.next();
+//                    ArrayList<String> string_array = (ArrayList<String>) json.get(string_key);
+//                    output.put(string_key, string_array);
+//                }
+//            }
+//        }
+//        catch(Exception e){e.printStackTrace();}
+//        return output;
+//    }
 
 }

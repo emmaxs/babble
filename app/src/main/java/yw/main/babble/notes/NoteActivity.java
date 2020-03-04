@@ -43,6 +43,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -99,7 +100,7 @@ public class NoteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // get app-wide shared prefs
-        sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
+//        sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
 
 
         editText = findViewById(R.id.EditText);
@@ -182,10 +183,7 @@ public class NoteActivity extends AppCompatActivity {
         toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
     }
 
-    //TODO:
-    // Change function to work with firebase
     public void Save(String fileName) {
-
         // all files will exist locally, but not necessarily be shown by notesFragment
         try {
             OutputStreamWriter out =
@@ -200,67 +198,53 @@ public class NoteActivity extends AppCompatActivity {
         // saving to firebase if wifi is good
         if(wifiConnection()){
             if (FileExists(fileName)){
-                Uri file_to_upload = Uri.fromFile(new File(fileName));
+                try {
+                    InputStream stream = openFileInput(fileName);;
+                    StorageReference noteRef = storageReference.child("notes").child(userId).child(fileName);
+                    UploadTask uploadTask = noteRef.putStream(stream);
 
-                // setting up hierarchy of files: eventually want /users/userID/Note.txt
+                    // from firebase console
+                    // Register observers to listen for when the download is done or if it fails
+                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            Toast.makeText(getBaseContext(), "Failed to save to Firebase...", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                            // ...
+                            Log.d("exs", filename + " saved to Firebase!");
+                            Toast.makeText(getBaseContext(), "Note saved to Firebase!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-                // Create a child reference
-                // usersRef points to "users"
-                StorageReference usersRef = storageReference.child("users");
+                    // TODO: add emotions to the file metadata
+                    StorageMetadata metadata = new StorageMetadata.Builder()
+                            .setContentType("files/txt")
+                            .setCustomMetadata("emotion", emotions)
+                            .build();
 
-                // Child references can also take paths
-                // userIDreft now points to "users/userID
-                // usersRef still points to "users"
-                StorageReference userIDref = usersRef.child(userId);
-
-                // usersRef = userIDref.getParent();
-
-                // StorageReference rootRef = userIDref.getRoot();
-
-                StorageReference noteRef = userIDref.child(fileName);
-                // database.getReference().child("users").child(userId).child(fileName).putFile(file_to_upload);
-                UploadTask uploadTask = noteRef.putFile(file_to_upload);
-
-                // from firebase console
-                // Register observers to listen for when the download is done or if it fails
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        Toast.makeText(getBaseContext(), "Failed to save to Firebase...", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                        // ...
-                        Toast.makeText(getBaseContext(), "Note saved to Firebase!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                // TODO
-                // add emotions to the file metadata
-                StorageMetadata metadata = new StorageMetadata.Builder()
-                        .setContentType("files/txt")
-                        .setCustomMetadata("emotion", emotions)
-                        .build();
-
-                noteRef.updateMetadata(metadata)
-                        .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                            @Override
-                            public void onSuccess(StorageMetadata storageMetadata) {
-                                // Updated metadata is in storageMetadata
-                                Log.d("metadata", "Metadata stored successfully");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Uh-oh, an error occurred!
-                                Log.d("metadata", "Error: metadata not stored.");
-                            }
-                        });
+                    noteRef.updateMetadata(metadata)
+                            .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                                @Override
+                                public void onSuccess(StorageMetadata storageMetadata) {
+                                    // Updated metadata is in storageMetadata
+                                    Log.d("metadata", "Metadata stored successfully");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Uh-oh, an error occurred!
+                                    Log.d("metadata", "Error: metadata not stored.");
+                                }
+                            });
+                } catch (Exception e) {}
             }
+
         }
 
 
@@ -271,34 +255,34 @@ public class NoteActivity extends AppCompatActivity {
 
 
         // Here we need to create or update map, which links users to their text files
-        // this is used in notesFragment prepareNotes-- because we want to load files from local storage,
-        // we need to know which user is associated with which files in local
-        // if the user to files map exists, just need to update it
-        if(sharedPreferences.contains(myMap)){
-            Map<String, ArrayList<String>> inputMap = loadMapfromPreferences();
-
-            // either the user exists in the map or doesn't
-            if (inputMap.containsKey(userId)){
-                // just update the ArrayList
-                inputMap.get(userId).add(fileName);
-            }
-            else{
-                // add new arraylist with filename in
-                ArrayList<String> files = new ArrayList<String>();
-                files.add(fileName);
-                inputMap.put(userId, files);
-            }
-
-        }
-        // else, it means no file has been put in for any user yet
-        else{
-            Map<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
-            // since if the map exists, it means there are no files associated with this user, put the user in
-            ArrayList<String> files = new ArrayList<String>();
-            files.add(fileName);
-            map.put(userId, files);
-            saveMaptoPreferences(map);
-        }
+//        // this is used in notesFragment prepareNotes-- because we want to load files from local storage,
+//        // we need to know which user is associated with which files in local
+//        // if the user to files map exists, just need to update it
+//        if(sharedPreferences.contains(myMap)){
+//            Map<String, ArrayList<String>> inputMap = loadMapfromPreferences();
+//
+//            // either the user exists in the map or doesn't
+//            if (inputMap.containsKey(userId)){
+//                // just update the ArrayList
+//                inputMap.get(userId).add(fileName);
+//            }
+//            else{
+//                // add new arraylist with filename in
+//                ArrayList<String> files = new ArrayList<String>();
+//                files.add(fileName);
+//                inputMap.put(userId, files);
+//            }
+//
+//        }
+//        // else, it means no file has been put in for any user yet
+//        else{
+//            Map<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
+//            // since if the map exists, it means there are no files associated with this user, put the user in
+//            ArrayList<String> files = new ArrayList<String>();
+//            files.add(fileName);
+//            map.put(userId, files);
+//            saveMaptoPreferences(map);
+//        }
     }
 
     public void saveMaptoPreferences(Map<String, ArrayList<String>> map){
