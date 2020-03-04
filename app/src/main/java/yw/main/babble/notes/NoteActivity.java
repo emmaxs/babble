@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -26,9 +25,6 @@ import com.ibm.watson.tone_analyzer.v3.model.ToneScore;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,8 +39,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -85,7 +79,8 @@ public class NoteActivity extends AppCompatActivity {
     private String userId;
     private StorageReference storageReference;
 
-    private String emotions;
+    private String detectedTone;
+    String title;
 
     private SharedPreferences sharedPreferences;
     // for app-wide shared prefs
@@ -143,18 +138,19 @@ public class NoteActivity extends AppCompatActivity {
                         ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
                         List<ToneScore> scores = toneAnalysis.getDocumentTone()
                                         .getTones();
-                                String detectedTones = "";
+                                detectedTone = "";
                                 for(ToneScore score:scores) {
                                     if(score.getScore() > 0.5f) {
-                                        detectedTones += score.getToneName() + " ";
+                                        detectedTone += score.getToneName() + " ";
                                     }
                                 }
                                 toastMessage =
                                         "The following emotions were detected:\n\n"
-                                                + detectedTones.toUpperCase();
+                                                + detectedTone.toUpperCase();
 
-                                // need to be able to access these when storing to firebase
-                                emotions = detectedTones;
+
+                                // Save file locally and to firebase
+                                Save(filename, textToAnalyze);
 
                                 // Run the toast on UI
                                 runOnUiThread(new Runnable() {
@@ -166,9 +162,6 @@ public class NoteActivity extends AppCompatActivity {
                                 });
                     }
                 });
-
-                // get a new file name to save (to firebase)
-                Save(filename);
                 setResult(Activity.RESULT_OK, intent);
                 // close the activity
                 finish();
@@ -183,25 +176,33 @@ public class NoteActivity extends AppCompatActivity {
         toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
     }
 
-    public void Save(String fileName) {
+    public void Save(String fileName, String content) {
         // all files will exist locally, but not necessarily be shown by notesFragment
         try {
             OutputStreamWriter out =
                     new OutputStreamWriter(openFileOutput(fileName, 0));
-            out.write(editText.getText().toString());
+            out.write(content);
             out.close();
-            Toast.makeText(this, "Note Saved!", Toast.LENGTH_SHORT).show();
+            Log.d("exs note save", "saved");
+//            Toast.makeText(getBaseContext(), "Note Saved!", Toast.LENGTH_SHORT).show();
         } catch (Throwable t) {
-            Toast.makeText(this, "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
+            Log.d("exs note save", "error");
+//            Toast.makeText(getBaseContext(), "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
         }
 
         // saving to firebase if wifi is good
         if(wifiConnection()){
             if (FileExists(fileName)){
                 try {
-                    InputStream stream = openFileInput(fileName);;
+                    InputStream stream = openFileInput(fileName);
                     StorageReference noteRef = storageReference.child("notes").child(userId).child(fileName);
-                    UploadTask uploadTask = noteRef.putStream(stream);
+                                        /** Add the metadata **/
+                    StorageMetadata metadata = new StorageMetadata.Builder()
+                            // TODO: add location as lat and long
+                            .setCustomMetadata("emotion", detectedTone)
+                            .build();
+
+                    UploadTask uploadTask = noteRef.putStream(stream, metadata);
 
                     // from firebase console
                     // Register observers to listen for when the download is done or if it fails
@@ -220,28 +221,6 @@ public class NoteActivity extends AppCompatActivity {
                             Toast.makeText(getBaseContext(), "Note saved to Firebase!", Toast.LENGTH_SHORT).show();
                         }
                     });
-
-                    // TODO: add emotions to the file metadata
-                    StorageMetadata metadata = new StorageMetadata.Builder()
-                            .setContentType("files/txt")
-                            .setCustomMetadata("emotion", emotions)
-                            .build();
-
-                    noteRef.updateMetadata(metadata)
-                            .addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                                @Override
-                                public void onSuccess(StorageMetadata storageMetadata) {
-                                    // Updated metadata is in storageMetadata
-                                    Log.d("metadata", "Metadata stored successfully");
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    // Uh-oh, an error occurred!
-                                    Log.d("metadata", "Error: metadata not stored.");
-                                }
-                            });
                 } catch (Exception e) {}
             }
 
