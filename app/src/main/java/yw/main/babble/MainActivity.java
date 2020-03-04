@@ -44,15 +44,46 @@ public class MainActivity extends AppCompatActivity {
         firebaseUser = firebaseAuth.getCurrentUser();
         checkPermissions();
 
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         // if nobody is logged in, load login screen
         if (firebaseUser == null) {
             Log.d("exs", "Firebase User is null");
             loadLoginScreen();
         }
+        else{
+            doTheRest();
+        }
+    }
 
-        setContentView(R.layout.activity_main);
+    public void onResume(){
+        super.onResume();
+        if (firebaseUser != null){
+            /*setContentView(R.layout.activity_main);
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);*/
+
+            // Navigation Drawer
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            // Passing each menu ID as a set of Ids because each
+            // menu should be considered as top level destinations.
+            mAppBarConfiguration = new AppBarConfiguration.Builder(
+                    R.id.nav_notes, R.id.nav_settings)
+                    .setDrawerLayout(drawer)
+                    .build();
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+            NavigationUI.setupWithNavController(navigationView, navController);
+        }
+    }
+
+    private void doTheRest(){
+        /*setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);*/
 
         // Navigation Drawer
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -95,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {
             // sign out
-            firebaseAuth.signOut();;
+            firebaseAuth.signOut();
             loadLoginScreen();
             return true;
         }

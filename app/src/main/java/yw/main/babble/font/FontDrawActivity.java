@@ -1,4 +1,4 @@
-package yw.main.babble;
+package yw.main.babble.font;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -21,6 +21,7 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import yw.main.babble.R;
 import yw.main.babble.font.BitmapBuilderAndSaver;
 import yw.main.babble.font.DrawingView;
 import yw.main.babble.font.Glyphs;
