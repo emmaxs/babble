@@ -10,7 +10,6 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ibm.cloud.sdk.core.security.IamAuthenticator;
 import com.ibm.watson.tone_analyzer.v3.ToneAnalyzer;
@@ -46,17 +45,17 @@ public class NoteActivity extends AppCompatActivity {
     Intent intent;
     NotesBuilder newNote;
 
+    // Tone Analysis
     IamAuthenticator authenticator;
     ToneAnalyzer toneAnalyzer;
     ToneOptions options;
     String textToAnalyze;
     String toastMessage;
 
-    // firebase
+    // Firebase
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
-    DatabaseReference databaseRef;
-    FirebaseFirestore db;
+    private FirebaseFirestore db;
     private String userId;
 
     private String detectedTone;
@@ -86,7 +85,9 @@ public class NoteActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
 
+        if (firebaseUser != null)
         userId = firebaseUser.getUid();
+
         db = FirebaseFirestore.getInstance();
 
         filename = "Note" + fileNumber + ".txt";
@@ -163,7 +164,7 @@ public class NoteActivity extends AppCompatActivity {
 
         // saving to firebase if wifi is good
         if (wifiConnection()) {
-            db.collection("users").document(userId).set(newNote);
+            db.collection("notes").document(userId).set(newNote);
         }
     }
 

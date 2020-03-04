@@ -1,11 +1,16 @@
 package yw.main.babble.notes;
 
+import com.google.firebase.firestore.ServerTimestamp;
+
+import java.util.Date;
+
 public class NotesBuilder {
 
     private String title, emotion,
             content;
     private Double latitude;
     private Double longitude;
+    @ServerTimestamp private Date date;
 
     // EMOTION CONSTANTS
     public static final String JOY = "JOY";
