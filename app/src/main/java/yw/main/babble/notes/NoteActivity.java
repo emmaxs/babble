@@ -13,6 +13,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -76,7 +78,10 @@ public class NoteActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private FirebaseStorage database;
+    FirebaseDatabase fdatabase;
+    DatabaseReference myRef;
     private String userId;
+
     private StorageReference storageReference;
 
     private String detectedTone;
@@ -119,6 +124,12 @@ public class NoteActivity extends AppCompatActivity {
         storageReference = database.getReference();
 
         userId = firebaseUser.getUid();
+
+        // Write a message to the database
+        fdatabase = FirebaseDatabase.getInstance();
+        myRef = fdatabase.getReference("message");
+//        myRef.setValue("Hello, World!");
+        myRef.child("users").setValue("Hello, World!");
 
         filename = "Note" + fileNumber + ".txt";
         FloatingActionButton fab = findViewById(R.id.fab);

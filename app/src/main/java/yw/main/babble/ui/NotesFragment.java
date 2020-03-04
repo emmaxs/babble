@@ -98,6 +98,7 @@ public class NotesFragment extends Fragment {
 
         // Create a storage reference from our app
         storageReference = database.getReference();
+        if (firebaseUser != null)
         userId = firebaseUser.getUid();
 
         // TODO: Add Snackbar
@@ -135,7 +136,7 @@ public class NotesFragment extends Fragment {
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
 
         // do the notes list
-        prepareNotesfromFirebase();
+//        prepareNotesfromFirebase();
         prepareNotes();
 
         // set adapter
@@ -148,12 +149,32 @@ public class NotesFragment extends Fragment {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-                        // delete - TODO: Right now we click on note
-                        Intent intent;
-                        intent = new Intent(getActivity(), NoteActivity.class);
-                        // This will change once we have a real db
-                        intent.putExtra(NOTE_INDEX, position);
-                        startActivityForResult(intent, SAVE_ENTRY);
+                        // Delete from adapter
+                        nAdapter.remove(position);
+                        nAdapter.notifyDataSetChanged();
+
+                        // Delete local files
+                        String filename = "Note" + position + ".txt";
+                        File dir = getActivity().getFilesDir();
+                        File file = new File(dir, filename);
+                        file.delete();
+
+                        // Delete from firebase
+                        StorageReference notesRef = storageReference.child("notes").child(userId).child(filename);
+                        // Delete the file
+                        notesRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                // File deleted successfully
+                                Log.d("exs", "we did it!");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Uh-oh, an error occurred!
+                                Log.d("exs", "oh no");
+                            }
+                        });
                         break;
                 }
                 // false : close the menu; true : not close the menu
@@ -192,16 +213,19 @@ public class NotesFragment extends Fragment {
                         for (StorageReference item : listResult.getItems()) {
                             try {
                                 File localFile = File.createTempFile("notes/"+ userId, "txt");
+                                Log.d("exs", localFile.getAbsolutePath());
 
                                 item.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                         // Local temp file has been created
+                                        Log.d("exs", "we did it!");
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception exception) {
                                         // Handle any errors
+                                        Log.d("exs", "failed");
                                     }
                                 });
                             } catch(IOException e) {}
@@ -212,6 +236,7 @@ public class NotesFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Uh-oh, an error occurred!
+                        Log.d("exs", "failed in list");
                     }
                 });
 
