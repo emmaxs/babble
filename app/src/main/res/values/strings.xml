@@ -39,4 +39,7 @@
     <string name="font_draw">Open Font Draw</string>
     <string name="themes">Change Theme</string>
     <string name="themes_summary">Paper, light, dark, etc</string>
+
+    <string name="paper_theme">Paper Theme</string>
+    <string name="hello_kitty">Hello Kitty</string>
 </resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.ThemeChangeFragment" >
+
+    <PreferenceCategory android:title="@string/themes">
+
+        <Preference>
+            android:key="paper"
+            android:title="@string/paper_theme"
+        </Preference>
+
+        <Preference>
+            android:key="hello_kitty"
+            android:title="@string/hello_kitty"
+
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>
