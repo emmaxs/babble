@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.DisplayMetrics;
@@ -23,16 +24,21 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -92,7 +98,6 @@ public class NotesFragment extends Fragment {
 
         // Create a storage reference from our app
         storageReference = database.getReference();
-
         userId = firebaseUser.getUid();
 
         // TODO: Add Snackbar
@@ -130,7 +135,8 @@ public class NotesFragment extends Fragment {
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
 
         // do the notes list
-//        prepareNotes();
+        prepareNotesfromFirebase();
+        prepareNotes();
 
         // set adapter
         nAdapter = new NotesAdapter(notesList, getActivity());
@@ -171,8 +177,43 @@ public class NotesFragment extends Fragment {
 
 
     private void prepareNotesfromFirebase(){
-        // get everything stored under the users/userId directory
-         StorageReference notesRef = storageReference.child("notes");
+        // get everything stored under the notes/userId directory
+        StorageReference notesRef = storageReference.child("notes").child(userId);
+
+        notesRef.listAll()
+                .addOnSuccessListener(new OnSuccessListener<ListResult>() {
+                    @Override
+                    public void onSuccess(ListResult listResult) {
+                        for (StorageReference prefix : listResult.getPrefixes()) {
+                            // All the prefixes under listRef.
+                            // You may call listAll() recursively on them.
+                        }
+
+                        for (StorageReference item : listResult.getItems()) {
+                            try {
+                                File localFile = File.createTempFile("notes/"+ userId, "txt");
+
+                                item.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                        // Local temp file has been created
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Handle any errors
+                                    }
+                                });
+                            } catch(IOException e) {}
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Uh-oh, an error occurred!
+                    }
+                });
 
     }
 
@@ -202,7 +243,7 @@ public class NotesFragment extends Fragment {
 //    }
 
     // old version
-   /* private void prepareNotes(){
+   private void prepareNotes(){
         File directory;
         directory = getActivity().getFilesDir();
         File[] files = directory.listFiles();
@@ -215,11 +256,11 @@ public class NotesFragment extends Fragment {
             NotesBuilder note = new NotesBuilder(theFile, Open(theFile));
             notesList.add(note);
         }
-    }*/
+    }
 
     public void onDataSetChanged() {
         notesList.clear();
-//        prepareNotes();
+        prepareNotes();
         nAdapter.notifyDataSetChanged();
     }
 
