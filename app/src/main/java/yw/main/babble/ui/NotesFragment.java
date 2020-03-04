@@ -25,8 +25,10 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -62,7 +64,7 @@ import yw.main.babble.notes.NotesBuilder;
 import yw.main.babble.R;
 
 public class NotesFragment extends Fragment {
-    ArrayList<NotesBuilder> notesList = new ArrayList<>();
+    ArrayList<NotesBuilder> notesList;
     private NotesAdapter nAdapter;
     private SwipeMenuListView listView;
     public static final String NOTE_INDEX = "NOTE_INDEX";
@@ -114,6 +116,26 @@ public class NotesFragment extends Fragment {
 
         listView = root.findViewById(R.id.notes);
 
+        // DB
+        db.collection("users").document(userId)
+                .collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                notesList = new ArrayList<>();
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()) {
+                        NotesBuilder note = document.toObject(NotesBuilder.class);
+                        notesList.add(note);
+                    }
+                    // set adapter
+                    nAdapter = new NotesAdapter(notesList, getActivity());
+                    listView.setAdapter(nAdapter);
+                } else {
+                    Log.d("exs", "Error getting documents: ", task.getException());
+                }
+            }
+        });
+
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
@@ -136,14 +158,6 @@ public class NotesFragment extends Fragment {
         listView.setMenuCreator(creator);
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
 
-        loadFirebase();
-
-        // do the notes list
-        prepareNotes();
-
-        // set adapter
-        nAdapter = new NotesAdapter(notesList, getActivity());
-        listView.setAdapter(nAdapter);
 
         // set listener for swipe actions
         listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
@@ -183,48 +197,32 @@ public class NotesFragment extends Fragment {
         return root;
     }
 
-    // old version
-    private void prepareNotes() {
-        File directory;
-        directory = getActivity().getFilesDir();
-        File[] files = directory.listFiles();
-        String theFile;
 
-        Log.d("exs", "File length is " + files.length);
-
-        for (int f = 1; f <= files.length; f++) {
-            theFile = "Note" + f + ".txt";
-            NotesBuilder note = new NotesBuilder(theFile, Open(theFile));
-            notesList.add(note);
-        }
-    }
-
-    private void loadFirebase() {
-        DocumentReference docRef = db.collection("notes").document(userId);
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("Emma", "Listen failed.", e);
-                    return;
-                }
-
-                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
-                        ? "Local" : "Server";
-
-                if (snapshot != null && snapshot.exists()) {
-                    Log.d("Emma", source + " data: " + snapshot.getData());
-                } else {
-                    Log.d("Emma", source + " data: null");
-                }
-            }
-        });
-    }
+//    private void loadFirebase() {
+//        DocumentReference docRef = db.collection("notes").document(userId);
+//        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable DocumentSnapshot snapshot,
+//                                @Nullable FirebaseFirestoreException e) {
+//                if (e != null) {
+//                    Log.w("Emma", "Listen failed.", e);
+//                    return;
+//                }
+//
+//                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
+//                        ? "Local" : "Server";
+//
+//                if (snapshot != null && snapshot.exists()) {
+//                    Log.d("Emma", source + " data: " + snapshot.getData());
+//                } else {
+//                    Log.d("Emma", source + " data: null");
+//                }
+//            }
+//        });
+//    }
 
     public void onDataSetChanged() {
         notesList.clear();
-        prepareNotes();
         nAdapter.notifyDataSetChanged();
     }
 

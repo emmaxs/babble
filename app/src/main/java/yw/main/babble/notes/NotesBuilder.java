@@ -22,6 +22,8 @@ public class NotesBuilder {
     public static final String CONFIDENT = "CONFIDENT";
     public static final String ANGER = "ANGER";
 
+    public NotesBuilder() {}
+
     public NotesBuilder(String title, String content) {
         this.title = title;
         this.content = content;

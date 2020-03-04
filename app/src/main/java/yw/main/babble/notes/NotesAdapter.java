@@ -7,12 +7,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-
 import java.util.ArrayList;
 
 import yw.main.babble.R;
 
 public class NotesAdapter extends BaseAdapter {
+
 
     private ArrayList<NotesBuilder> notesList;
     private Activity activity;
