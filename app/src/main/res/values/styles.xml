@@ -16,6 +16,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="JournalTheme" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@drawable/paper1</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

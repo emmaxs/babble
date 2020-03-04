@@ -98,6 +98,10 @@ public class NoteActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //TODO: switch theme
+        setTheme(R.style.JournalTheme);
+
+
         // get app-wide shared prefs
         sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
 
@@ -180,6 +184,11 @@ public class NoteActivity extends AppCompatActivity {
         authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
         toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
         toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
+    }
+
+    public void onResume(){
+        super.onResume();
+        //TODO: change theme (use sharedprefs)
     }
 
     //TODO:

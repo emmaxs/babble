@@ -9,6 +9,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -179,6 +181,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 // TODO: themes
+                ThemeChangeFragment themeFrag= new ThemeChangeFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(((ViewGroup)getView().getParent()).getId(),themeFrag,"tag");
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
                 return true;
             }
         });

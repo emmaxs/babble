@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setTheme(R.style.JournalTheme);
+
         // Here we check if the user is logged in and, if not, open the login screen
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
