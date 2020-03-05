@@ -25,7 +25,7 @@
     <style name = "HeartsTheme" parent="Theme.AppCompat" >
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">#BC7C9C</item>
+
         <item name = "android:textColor">#FFADC6</item>
         <item name="colorButtonNormal">#A74482</item>
         <item name="colorPrimaryDark">#A74482</item>

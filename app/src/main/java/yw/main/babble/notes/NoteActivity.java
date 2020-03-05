@@ -1,16 +1,28 @@
+
 package yw.main.babble.notes;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.ibm.cloud.sdk.core.security.IamAuthenticator;
 import com.ibm.watson.tone_analyzer.v3.ToneAnalyzer;
@@ -21,36 +33,51 @@ import com.ibm.watson.tone_analyzer.v3.model.ToneScore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import yw.main.babble.R;
-import yw.main.babble.ui.NotesFragment;
 
-public class NoteActivity extends AppCompatActivity {
+import static yw.main.babble.ui.NotesFragment.CONTENT;
+import static yw.main.babble.ui.NotesFragment.ID;
+import static yw.main.babble.ui.NotesFragment.NEW_NOTE;
+import static yw.main.babble.ui.NotesFragment.TITLE;
+import static yw.main.babble.ui.NotesFragment.UPDATE_NOTE;
+import static yw.main.babble.ui.NotesFragment.WRITE_MODE;
+
+public class NoteActivity extends AppCompatActivity implements LocationListener {
     EditText editText;
-    int fileNumber;
-    String filename = "";
     Intent intent;
     NotesBuilder newNote;
+
+    // Passed from firebase
+    int mode = NEW_NOTE;
+    String title = "Untitled";
+    String content;
+    String docId;
+
+    // Managing the location
+    LocationManager locationManager;
+    private double currentLatitude = 0;
+    private double currentLongitude = 0;
+    private static final int PERMISSIONS_REQUEST = 2;
 
     // Tone Analysis
     IamAuthenticator authenticator;
     ToneAnalyzer toneAnalyzer;
     ToneOptions options;
-    String textToAnalyze;
     String toastMessage;
 
     // Firebase
@@ -60,7 +87,7 @@ public class NoteActivity extends AppCompatActivity {
     private String userId;
 
     SharedPreferences sharedPreferences;
-    private String detectedTone;
+    private String detectedTone = "";
 
     // for app-wide shared prefs
     public static final String myPrefs = "MyPrefs";
@@ -74,30 +101,33 @@ public class NoteActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //TODO: switch theme
-        setTheme(R.style.JournalTheme);
+//        setTheme(R.style.JournalTheme);
 
         // get app-wide shared prefs
         sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
 
         editText = findViewById(R.id.EditText);
         intent = getIntent();
-        if (intent.getIntExtra(NotesFragment.NOTE_INDEX, 0) != 0) {
-            fileNumber = intent.getIntExtra(NotesFragment.NOTE_INDEX, 0) + 1;
-        }
-        else {
-            File[] files = getFilesDir().listFiles();
-            fileNumber = files.length + 1;
+
+        // Set up the note if you are just updating
+        if (intent.getIntExtra(WRITE_MODE, 0) == UPDATE_NOTE) {
+            // set the mode
+            mode = UPDATE_NOTE;
+            docId = intent.getStringExtra(ID);
+            // TODO: Do something with title
+            title = intent.getStringExtra(TITLE);
+            // Set the content of the edit text
+            editText.setText(intent.getStringExtra(CONTENT));
         }
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
 
         if (firebaseUser != null)
-        userId = firebaseUser.getUid();
+            userId = firebaseUser.getUid();
 
         db = FirebaseFirestore.getInstance();
 
-        filename = "Note" + fileNumber + ".txt";
         FloatingActionButton fab = findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -105,39 +135,74 @@ public class NoteActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // Get string from Edit Text
-                textToAnalyze = editText.getText().toString();
+                content = editText.getText().toString();
                 // Build the tone options
-                options = new ToneOptions.Builder().text(textToAnalyze).build();
+                options = new ToneOptions.Builder().text(content).build();
                 // Query the service
                 AsyncTask.execute(new Runnable() {
                     @Override
                     public void run() {
                         ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
                         List<ToneScore> scores = toneAnalysis.getDocumentTone()
-                                        .getTones();
-                                detectedTone = "";
-                                for(ToneScore score:scores) {
-                                    if(score.getScore() > 0.5f) {
-                                        detectedTone += score.getToneName() + " ";
-                                    }
+                                .getTones();
+                        double max = 0;
+                        // Take the emotion with the highest score
+                        for(ToneScore score:scores) {
+                            if (score.getScore() > max) {
+                                max = score.getScore();
+                                detectedTone = score.getToneName().toUpperCase();
+                            }
+                        }
+                        toastMessage =
+                                "The following emotions were detected:\n\n"
+                                        + detectedTone.toUpperCase();
+
+                        // Save to firebase
+                        switch (mode) {
+                            case NEW_NOTE:
+                                newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
+                                if (wifiConnection()) {
+                                    db.collection("users").document(userId)
+                                            .collection("notes").add(newNote);
                                 }
-                                toastMessage =
-                                        "The following emotions were detected:\n\n"
-                                                + detectedTone.toUpperCase();
+                                break;
+                            case UPDATE_NOTE:
+                                if (wifiConnection()) {
+                                    DocumentReference notesRef = db.collection("users").document(userId)
+                                            .collection("notes").document(docId);
+                                    Map<String,Object> updates = new HashMap<>();
+                                    updates.put("id", docId);
+                                    updates.put("content", content);
+                                    updates.put("title", title);
+                                    updates.put("latitude", currentLatitude);
+                                    updates.put("longitude", currentLongitude);
+                                    updates.put("emotion", detectedTone);
+                                    updates.put("timestamp", FieldValue.serverTimestamp());
+                                    notesRef.update(updates)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d("EXS", "DocumentSnapshot successfully updated!");
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w("EXS", "Error updating document", e);
+                                                }
+                                            });
+                                }
+                                break;
+                        }
 
-                                // Save file locally and to firebase
-                        // TODO: merge with location
-                                newNote = new NotesBuilder(filename, textToAnalyze, detectedTone, 0.0, 0.0);
-                                Save(filename);
-
-                                // Run the toast on UI
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(getBaseContext(),
-                                                toastMessage, Toast.LENGTH_LONG).show();
-                                    }
-                                });
+                        // Run the toast on UI
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getBaseContext(),
+                                        toastMessage, Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 });
                 setResult(Activity.RESULT_OK, intent);
@@ -145,8 +210,6 @@ public class NoteActivity extends AppCompatActivity {
                 finish();
             }
         });
-        // set these strings better
-        editText.setText(Open(filename));
 
         // Sentiment analysis
         authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
@@ -159,67 +222,67 @@ public class NoteActivity extends AppCompatActivity {
         //TODO: change theme (use sharedprefs)
     }
 
-    public void Save(String fileName) {
-        // TODO: remove this part
-        // all files will exist locally, but not necessarily be shown by notesFragment
-        try {
-            OutputStreamWriter out =
-                    new OutputStreamWriter(openFileOutput(fileName, 0));
-            out.write(newNote.getContent());
-            out.close();
-            Log.d("exs note save", "saved");
-//            Toast.makeText(getBaseContext(), "Note Saved!", Toast.LENGTH_SHORT).show();
-        } catch (Throwable t) {
-            Log.d("exs note save", "error");
-//            Toast.makeText(getBaseContext(), "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
-        }
-
-        // saving to firebase if wifi is good
-        if (wifiConnection()) {
-            db.collection("users").document(userId)
-                    .collection("notes").add(newNote);
-        }
-    }
-
     // check wifi connection
     private boolean wifiConnection() {
         WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
-            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-            if( wifiInfo.getNetworkId() == -1 ){
-                return false; // not connected to access point
-            }
-            return true; // connected to access point
-        }
-        else {
-            return false; // Wi-Fi is off
-        }
+//        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
+//            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+//            if( wifiInfo.getNetworkId() == -1 ){
+//                return false; // not connected to access point
+//            }
+        return true; // connected to access point
+//        }
+//        else {
+//            return false; // Wi-Fi is off
+//        }
     }
 
-    public boolean FileExists(String fname){
-        File file = getBaseContext().getFileStreamPath(fname);
-        return file.exists();
+    private void initLocationManager(){
+        try {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            String provider = locationManager.getBestProvider(criteria, true);
+            // Log.d provider will print GPS
+            locationManager.requestLocationUpdates(provider, 0, 0, this);
+            Location location = locationManager.getLastKnownLocation(provider);
+            // One situation to use callback manually
+            onLocationChanged(location);
+        }
+        catch (SecurityException e) {}
     }
 
-    public String Open(String fileName) {
-        String content = "";
-        if (FileExists(fileName)) {
-            try {
-                InputStream in = openFileInput(fileName);
-                if ( in != null) {
-                    InputStreamReader tmp = new InputStreamReader( in );
-                    BufferedReader reader = new BufferedReader(tmp);
-                    String str;
-                    StringBuilder buf = new StringBuilder();
-                    while ((str = reader.readLine()) != null) {
-                        buf.append(str + "\n");
-                    } in .close();
-                    content = buf.toString();
-                }
-            } catch (java.io.FileNotFoundException e) {} catch (Throwable t) {
-                Toast.makeText(this, "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
-            }
+    public void onLocationChanged(Location location) {
+        if (location == null) return;
+        // location object gets you current latitude and long of phone
+        currentLatitude = location.getLatitude();
+        currentLongitude = location.getLongitude();
+    }
+
+    public void onDestroy(){
+        super.onDestroy();
+        if(locationManager != null)
+            locationManager.removeUpdates(this);
+    }
+
+    public void onProviderEnabled(String provider) {}
+    public void onProviderDisabled(String provider) {}
+    public void onStatusChanged(String provider, int status, Bundle bundle) {}
+
+    public void checkPermissions(){
+        if(Build.VERSION.SDK_INT < 23) return;
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST);
+        else
+            initLocationManager();
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(requestCode == PERMISSIONS_REQUEST){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                initLocationManager();
         }
-        return content;
     }
 }
