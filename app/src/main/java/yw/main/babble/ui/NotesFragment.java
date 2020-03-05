@@ -182,10 +182,6 @@ public class NotesFragment extends Fragment {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-                        // Delete from adapter
-//                        nAdapter.remove(position);
-//                        nAdapter.notifyDataSetChanged();
-
                         db.collection("users").document(userId)
                                 .collection("notes").document(nAdapter.getItem(position).getId())
                                 .delete()
@@ -225,12 +221,6 @@ public class NotesFragment extends Fragment {
         return root;
     }
 
-
-    public void onDataSetChanged() {
-//        notesList.clear();
-//        nAdapter.notifyDataSetChanged();
-    }
-
     // Put them back after config change
     @Override
     public void onResume() {
@@ -248,8 +238,6 @@ public class NotesFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SAVE_ENTRY) {
             if (resultCode == Activity.RESULT_OK) {
-                onDataSetChanged();
-                // TODO: For a new note just add it
             }
         }
     }

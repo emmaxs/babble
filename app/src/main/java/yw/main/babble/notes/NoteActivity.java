@@ -1,12 +1,19 @@
 package yw.main.babble.notes;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -28,6 +35,8 @@ import com.google.firebase.auth.FirebaseUser;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.View;
@@ -47,7 +56,7 @@ import static yw.main.babble.ui.NotesFragment.TITLE;
 import static yw.main.babble.ui.NotesFragment.UPDATE_NOTE;
 import static yw.main.babble.ui.NotesFragment.WRITE_MODE;
 
-public class NoteActivity extends AppCompatActivity {
+public class NoteActivity extends AppCompatActivity implements LocationListener {
     EditText editText;
     Intent intent;
     NotesBuilder newNote;
@@ -58,6 +67,11 @@ public class NoteActivity extends AppCompatActivity {
     String content;
     String docId;
 
+    // Managing the location
+    LocationManager locationManager;
+    private double currentLatitude = 0;
+    private double currentLongitude = 0;
+    private static final int PERMISSIONS_REQUEST = 2;
 
     // Tone Analysis
     IamAuthenticator authenticator;
@@ -72,7 +86,7 @@ public class NoteActivity extends AppCompatActivity {
     private String userId;
 
     SharedPreferences sharedPreferences;
-    private String detectedTone;
+    private String detectedTone = "";
 
     // for app-wide shared prefs
     public static final String myPrefs = "MyPrefs";
@@ -130,10 +144,12 @@ public class NoteActivity extends AppCompatActivity {
                         ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
                         List<ToneScore> scores = toneAnalysis.getDocumentTone()
                                 .getTones();
-                        detectedTone = "";
+                        double max = 0;
+                        // Take the emotion with the highest score
                         for(ToneScore score:scores) {
-                            if(score.getScore() > 0.5f) {
-                                detectedTone += score.getToneName() + " ";
+                            if (score.getScore() > max) {
+                                max = score.getScore();
+                                detectedTone = score.getToneName().toUpperCase();
                             }
                         }
                         toastMessage =
@@ -141,10 +157,9 @@ public class NoteActivity extends AppCompatActivity {
                                         + detectedTone.toUpperCase();
 
                         // Save to firebase
-                        // TODO: merge with location
                         switch (mode) {
                             case NEW_NOTE:
-                                newNote = new NotesBuilder(title, content, detectedTone, 0.0, 0.0);
+                                newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
 //                                if (wifiConnection()) {
                                     db.collection("users").document(userId)
                                             .collection("notes").add(newNote);
@@ -155,6 +170,7 @@ public class NoteActivity extends AppCompatActivity {
                                     DocumentReference notesRef = db.collection("users").document(userId)
                                             .collection("notes").document(docId);
                                     Map<String,Object> updates = new HashMap<>();
+                                    updates.put("id", docId);
                                     updates.put("content", content);
                                     updates.put("title", title);
                                     updates.put("timestamp", FieldValue.serverTimestamp());
@@ -216,4 +232,53 @@ public class NoteActivity extends AppCompatActivity {
 //            return false; // Wi-Fi is off
 //        }
 //    }
+
+    private void initLocationManager(){
+        try {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            String provider = locationManager.getBestProvider(criteria, true);
+            // Log.d provider will print GPS
+            locationManager.requestLocationUpdates(provider, 0, 0, this);
+            Location location = locationManager.getLastKnownLocation(provider);
+            // One situation to use callback manually
+            onLocationChanged(location);
+        }
+        catch (SecurityException e) {}
+    }
+
+    public void onLocationChanged(Location location) {
+        if (location == null) return;
+        // location object gets you current latitude and long of phone
+        currentLatitude = location.getLatitude();
+        currentLongitude = location.getLongitude();
+    }
+
+    public void onDestroy(){
+        super.onDestroy();
+        if(locationManager != null)
+            locationManager.removeUpdates(this);
+    }
+
+    public void onProviderEnabled(String provider) {}
+    public void onProviderDisabled(String provider) {}
+    public void onStatusChanged(String provider, int status, Bundle bundle) {}
+
+    public void checkPermissions(){
+        if(Build.VERSION.SDK_INT < 23) return;
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST);
+        else
+            initLocationManager();
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(requestCode == PERMISSIONS_REQUEST){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                initLocationManager();
+        }
+    }
 }
