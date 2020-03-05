@@ -95,15 +95,6 @@ public class NotesFragment extends Fragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_notes, container, false);
 
-        // set firebase things
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
-
-        if (firebaseUser != null)
-            userId = firebaseUser.getUid();
-
-        db = FirebaseFirestore.getInstance();
-
         // TODO: Add Snackbar
         FloatingActionButton fab = root.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -116,25 +107,35 @@ public class NotesFragment extends Fragment {
 
         listView = root.findViewById(R.id.notes);
 
-        // DB
-        db.collection("users").document(userId)
-                .collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                notesList = new ArrayList<>();
-                if(task.isSuccessful()){
-                    for(QueryDocumentSnapshot document : task.getResult()) {
-                        NotesBuilder note = document.toObject(NotesBuilder.class);
-                        notesList.add(note);
+        // set firebase things
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
+        if (firebaseUser != null) {
+            userId = firebaseUser.getUid();
+
+            db = FirebaseFirestore.getInstance();
+
+            // DB
+            db.collection("users").document(userId)
+                    .collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    notesList = new ArrayList<>();
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            NotesBuilder note = document.toObject(NotesBuilder.class);
+                            notesList.add(note);
+                        }
+                        // set adapter
+                        nAdapter = new NotesAdapter(notesList, getActivity());
+                        listView.setAdapter(nAdapter);
+                    } else {
+                        Log.d("exs", "Error getting documents: ", task.getException());
                     }
-                    // set adapter
-                    nAdapter = new NotesAdapter(notesList, getActivity());
-                    listView.setAdapter(nAdapter);
-                } else {
-                    Log.d("exs", "Error getting documents: ", task.getException());
                 }
-            }
-        });
+            });
+        }
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
