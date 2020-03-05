@@ -22,9 +22,6 @@ import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import yw.main.babble.R;
-import yw.main.babble.font.BitmapBuilderAndSaver;
-import yw.main.babble.font.DrawingView;
-import yw.main.babble.font.Glyphs;
 
 public class FontDrawActivity extends Activity {
     private BitmapBuilderAndSaver builderAndSaver = new BitmapBuilderAndSaver();
