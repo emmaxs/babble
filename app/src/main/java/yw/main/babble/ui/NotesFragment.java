@@ -130,25 +130,49 @@ public class NotesFragment extends Fragment {
             db = FirebaseFirestore.getInstance();
 
             // DB
+//            db.collection("users").document(userId)
+//                    .collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                @Override
+//                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                    notesList = new ArrayList<>();
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            NotesBuilder note = document.toObject(NotesBuilder.class);
+//                            note.setId(document.getId());
+//                            notesList.add(note);
+//                        }
+//                        // set adapter
+//                        nAdapter = new NotesAdapter(notesList, getActivity());
+//                        listView.setAdapter(nAdapter);
+//                    } else {
+//                        Log.d("exs", "Error getting documents: ", task.getException());
+//                    }
+//                }
+//            });
+
+            // Listen for DB changes
             db.collection("users").document(userId)
-                    .collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    notesList = new ArrayList<>();
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            NotesBuilder note = document.toObject(NotesBuilder.class);
-                            note.setId(document.getId());
-                            notesList.add(note);
+                    .collection("notes")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("EXS", "Listen failed.", e);
+                                return;
+                            }
+
+                            List<String> cities = new ArrayList<>();
+                            for (QueryDocumentSnapshot doc : value) {
+                                NotesBuilder note = doc.toObject(NotesBuilder.class);
+                                note.setId(doc.getId());
+                                notesList.add(note);
+                            }
+                            // set adapter
+                            nAdapter = new NotesAdapter(notesList, getActivity());
+                            listView.setAdapter(nAdapter);
                         }
-                        // set adapter
-                        nAdapter = new NotesAdapter(notesList, getActivity());
-                        listView.setAdapter(nAdapter);
-                    } else {
-                        Log.d("exs", "Error getting documents: ", task.getException());
-                    }
-                }
-            });
+                    });
         }
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -180,15 +204,24 @@ public class NotesFragment extends Fragment {
                 switch (index) {
                     case 0:
                         // Delete from adapter
-                        nAdapter.remove(position);
-                        nAdapter.notifyDataSetChanged();
+//                        nAdapter.remove(position);
+//                        nAdapter.notifyDataSetChanged();
 
-                        // Delete local files
-                        String filename = "Note" + position + ".txt";
-                        File dir = getActivity().getFilesDir();
-                        File file = new File(dir, filename);
-                        file.delete();
-
+                        db.collection("users").document(userId)
+                                .collection("notes").document(nAdapter.getItem(position).getId())
+                                .delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d("EXS", "DocumentSnapshot successfully deleted!");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("EXS", "Error deleting document", e);
+                                    }
+                                });
 
                         break;
                 }
