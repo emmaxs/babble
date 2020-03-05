@@ -176,7 +176,8 @@ public class NoteActivity extends AppCompatActivity {
 
         // saving to firebase if wifi is good
         if (wifiConnection()) {
-            db.collection("notes").document(userId).set(newNote);
+            db.collection("users").document(userId)
+                    .collection("notes").add(newNote);
         }
     }
 
