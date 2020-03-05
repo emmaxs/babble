@@ -25,8 +25,10 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -62,11 +64,18 @@ import yw.main.babble.notes.NotesBuilder;
 import yw.main.babble.R;
 
 public class NotesFragment extends Fragment {
-    ArrayList<NotesBuilder> notesList = new ArrayList<>();
+    ArrayList<NotesBuilder> notesList;
     private NotesAdapter nAdapter;
     private SwipeMenuListView listView;
-    public static final String NOTE_INDEX = "NOTE_INDEX";
+
+    public static final String ID = "ID";
+    public static final String CONTENT = "CONTENT";
+    public static final String TITLE = "TITLE";
     public static final int SAVE_ENTRY = 1;
+
+    public static final String WRITE_MODE = "WRITE_MODE";
+    public static final int NEW_NOTE = 1;
+    public static final int UPDATE_NOTE = 2;
 
     // firebase
     private FirebaseAuth firebaseAuth;
@@ -75,11 +84,16 @@ public class NotesFragment extends Fragment {
     private String userId;
 
     // shared prefs
+    private SharedPreferences sharedPreferences;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // get app-wide shared prefs
+        sharedPreferences = getActivity().getApplicationContext()
+                .getSharedPreferences(NoteActivity.myPrefs, Context.MODE_PRIVATE);
+
     }
 
     public int dpToPx(int dp) {
@@ -93,26 +107,74 @@ public class NotesFragment extends Fragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_notes, container, false);
 
-        // set firebase things
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
-
-        if (firebaseUser != null)
-            userId = firebaseUser.getUid();
-
-        db = FirebaseFirestore.getInstance();
-
         // TODO: Add Snackbar
         FloatingActionButton fab = root.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(getActivity(), NoteActivity.class);
+                myIntent.putExtra(WRITE_MODE, NEW_NOTE);
                 startActivityForResult(myIntent, NotesFragment.SAVE_ENTRY);
             }
         });
 
         listView = root.findViewById(R.id.notes);
+
+        // set firebase things
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
+        if (firebaseUser != null) {
+            userId = firebaseUser.getUid();
+
+            db = FirebaseFirestore.getInstance();
+            notesList = new ArrayList<>();
+
+            // DB
+//            db.collection("users").document(userId)
+//                    .collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                @Override
+//                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                    notesList = new ArrayList<>();
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            NotesBuilder note = document.toObject(NotesBuilder.class);
+//                            note.setId(document.getId());
+//                            notesList.add(note);
+//                        }
+//                        // set adapter
+//                        nAdapter = new NotesAdapter(notesList, getActivity());
+//                        listView.setAdapter(nAdapter);
+//                    } else {
+//                        Log.d("exs", "Error getting documents: ", task.getException());
+//                    }
+//                }
+//            });
+
+            // Listen for DB changes
+            db.collection("users").document(userId)
+                    .collection("notes")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("EXS", "Listen failed.", e);
+                                return;
+                            }
+
+                            List<String> cities = new ArrayList<>();
+                            for (QueryDocumentSnapshot doc : value) {
+                                NotesBuilder note = doc.toObject(NotesBuilder.class);
+                                note.setId(doc.getId());
+                                notesList.add(note);
+                            }
+                            // set adapter
+                            nAdapter = new NotesAdapter(notesList, getActivity());
+                            listView.setAdapter(nAdapter);
+                        }
+                    });
+        }
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
@@ -136,15 +198,6 @@ public class NotesFragment extends Fragment {
         listView.setMenuCreator(creator);
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
 
-        loadFirebase();
-
-        // do the notes list
-        prepareNotes();
-
-        // set adapter
-        nAdapter = new NotesAdapter(notesList, getActivity());
-        listView.setAdapter(nAdapter);
-
         // set listener for swipe actions
         listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
@@ -152,15 +205,24 @@ public class NotesFragment extends Fragment {
                 switch (index) {
                     case 0:
                         // Delete from adapter
-                        nAdapter.remove(position);
-                        nAdapter.notifyDataSetChanged();
+//                        nAdapter.remove(position);
+//                        nAdapter.notifyDataSetChanged();
 
-                        // Delete local files
-                        String filename = "Note" + position + ".txt";
-                        File dir = getActivity().getFilesDir();
-                        File file = new File(dir, filename);
-                        file.delete();
-
+                        db.collection("users").document(userId)
+                                .collection("notes").document(nAdapter.getItem(position).getId())
+                                .delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d("EXS", "DocumentSnapshot successfully deleted!");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("EXS", "Error deleting document", e);
+                                    }
+                                });
 
                         break;
                 }
@@ -174,8 +236,10 @@ public class NotesFragment extends Fragment {
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
                 Intent intent;
                 intent = new Intent(getActivity(), NoteActivity.class);
-                // This will change once we have a real db
-                intent.putExtra(NOTE_INDEX, position);
+                intent.putExtra(ID, nAdapter.getItem(position).getId());
+                intent.putExtra(CONTENT, nAdapter.getItem(position).getContent());
+                intent.putExtra(TITLE, nAdapter.getItem(position).getTitle());
+                intent.putExtra(WRITE_MODE, UPDATE_NOTE);
                 startActivityForResult(intent, SAVE_ENTRY);
             }
         });
@@ -183,49 +247,10 @@ public class NotesFragment extends Fragment {
         return root;
     }
 
-    // old version
-    private void prepareNotes() {
-        File directory;
-        directory = getActivity().getFilesDir();
-        File[] files = directory.listFiles();
-        String theFile;
-
-        Log.d("exs", "File length is " + files.length);
-
-        for (int f = 1; f <= files.length; f++) {
-            theFile = "Note" + f + ".txt";
-            NotesBuilder note = new NotesBuilder(theFile, Open(theFile));
-            notesList.add(note);
-        }
-    }
-
-    private void loadFirebase() {
-        DocumentReference docRef = db.collection("notes").document(userId);
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("Emma", "Listen failed.", e);
-                    return;
-                }
-
-                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
-                        ? "Local" : "Server";
-
-                if (snapshot != null && snapshot.exists()) {
-                    Log.d("Emma", source + " data: " + snapshot.getData());
-                } else {
-                    Log.d("Emma", source + " data: null");
-                }
-            }
-        });
-    }
 
     public void onDataSetChanged() {
-        notesList.clear();
-        prepareNotes();
-        nAdapter.notifyDataSetChanged();
+//        notesList.clear();
+//        nAdapter.notifyDataSetChanged();
     }
 
     // Put them back after config change
@@ -240,31 +265,6 @@ public class NotesFragment extends Fragment {
         }
     }
 
-    // duplicate method - try to reduce or do in thread
-    public String Open(String fileName) {
-        String content = "";
-        try {
-            InputStream in = getActivity().openFileInput(fileName);
-            if (in != null) {
-                InputStreamReader tmp = new InputStreamReader(in);
-                BufferedReader reader = new BufferedReader(tmp);
-                String str;
-                StringBuilder buf = new StringBuilder();
-                while ((str = reader.readLine()) != null) {
-                    buf.append(str + "\n");
-                }
-                in.close();
-
-                content = buf.toString();
-            }
-        } catch (java.io.FileNotFoundException e) {
-        } catch (Throwable t) {
-            Toast.makeText(getActivity(), "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
-        }
-
-        return content;
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -276,5 +276,3 @@ public class NotesFragment extends Fragment {
         }
     }
 }
-
-

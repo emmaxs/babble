@@ -1,16 +1,15 @@
 package yw.main.babble.notes;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.ServerTimestamp;
-
-import java.util.Date;
 
 public class NotesBuilder {
 
     private String title, emotion,
-            content;
+            content, id;
     private Double latitude;
     private Double longitude;
-    @ServerTimestamp private Date date;
+    @ServerTimestamp private Timestamp timestamp;
 
     // EMOTION CONSTANTS
     public static final String JOY = "JOY";
@@ -22,9 +21,27 @@ public class NotesBuilder {
     public static final String CONFIDENT = "CONFIDENT";
     public static final String ANGER = "ANGER";
 
+    public NotesBuilder() {}
+
     public NotesBuilder(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
     }
 
     public NotesBuilder(String title, String content, String emotion, Double latitude, Double longitude) {
