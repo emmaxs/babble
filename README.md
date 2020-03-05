@@ -18,9 +18,6 @@ Here is a link to the MVC and Threading Diagram we presented during [Show and Te
 ### APK
 APK Release Date: March 6th, 2019. 
 
-### Known Issues
-We are using Google firebase authentication, and for some reason, after you make sign-up through the app and make an account, the first time you logout, it doesn't recognize your password until you reset it. To test the login functionality while we are debugging, feel free to use the account `test@gmail.com` with `tester1` as the password.
-
 ### Demo Day Presentation
 Coming soon.
 
