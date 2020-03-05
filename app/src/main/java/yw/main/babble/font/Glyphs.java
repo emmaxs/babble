@@ -2,6 +2,8 @@ package yw.main.babble.font;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
@@ -60,7 +62,7 @@ public class Glyphs {
     }
 
     /**
-     * Builds map from characters to font bitmaps
+     * Builds map from characters to default_font bitmaps
      */
     private void buildMap() {
         for(int i = 0; i < 26; i++) {
@@ -78,20 +80,29 @@ public class Glyphs {
     }
 
     /**
-     * Draws a string on a canvas using the font we have stored
+     * Draws a string on a canvas using the default_font we have stored
      * @param canvas Canvas on which to draw
      * @param text Text you want to draw
      * @param x X position of upper left corner of text
      * @param y Y position of upper left corner of text
      * @param size Font size - generally 0<size<=1.
      */
-    public void drawString(Canvas canvas, String text, int x, int y,double size) {
+    public void drawString(Canvas canvas, String text, int cursorLocation, int x, int y, double size) {
         if(canvas == null) {
             Log.d(TAG, "Canvas Is Null");
         } else {
             int textPosition = 0;
-            for(int i = 0; i < text.length(); i++) {
+            int i = 0;
+            for(; i < text.length(); i++) {
                 Character ch = text.charAt(i);
+                if(i == cursorLocation) {
+                    Paint p = new Paint();
+                    p.setColor(Color.BLACK);
+                    p.setStrokeWidth(3);
+                    p.setAntiAlias(true);
+                    Log.d("drawString()","cursorLocationFound");
+                    canvas.drawLine((float) (x+(textPosition*CHAR_BITMAP_WIDTH*size)), y, (float) (x+(textPosition*(CHAR_BITMAP_WIDTH*size))), (float) (y+(CHAR_BITMAP_HEIGHT*size)), p);
+                }
                 if(ch.equals('\n')) {
                     y+= CHAR_BITMAP_HEIGHT*size;
                     textPosition = 0;
@@ -101,10 +112,18 @@ public class Glyphs {
 //                    canvas.drawBitmap(glyphs.get(ch), x + (i* CHAR_BITMAP_WIDTH), y, null);
                     canvas.drawBitmap(glyphs.get(ch), null, new Rect(
                                     (int) (x+(textPosition*(CHAR_BITMAP_WIDTH*size))), y,
-                            (int) (x+((textPosition*(CHAR_BITMAP_WIDTH*size) + (CHAR_BITMAP_WIDTH*size)))), (int) (y+(CHAR_BITMAP_HEIGHT*size))),
+                                    (int) (x+((textPosition*(CHAR_BITMAP_WIDTH*size) + (CHAR_BITMAP_WIDTH*size)))), (int) (y+(CHAR_BITMAP_HEIGHT*size))),
                             null);
                 }
                 textPosition++;
+            }
+            if(i == cursorLocation) {
+                Paint p = new Paint();
+                p.setColor(Color.BLACK);
+                p.setStrokeWidth(3);
+                p.setAntiAlias(true);
+                Log.d("drawString()","cursorLocationFound");
+                canvas.drawLine((float) (x+(textPosition*CHAR_BITMAP_WIDTH*size)), y, (float) (x+(textPosition*(CHAR_BITMAP_WIDTH*size))), (float) (y+(CHAR_BITMAP_HEIGHT*size)), p);
             }
         }
     }

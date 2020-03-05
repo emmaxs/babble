@@ -46,4 +46,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:21.4.0'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'androidx.preference:preference:1.1.0'
+    implementation(name: 'library-release', ext: 'aar')
 }

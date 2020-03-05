@@ -3,13 +3,17 @@ package yw.main.babble.font;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CustomEditText extends AppCompatEditText {
-    private static final double TEXT_SIZE = .5;
+    private static final double TEXT_SIZE = .3;
     private Glyphs glyphs;
     private BitmapBuilderAndSaver builderAndSaver;
     public CustomEditText(Context context) {
@@ -31,6 +35,10 @@ public class CustomEditText extends AppCompatEditText {
         builderAndSaver = new BitmapBuilderAndSaver();
         builderAndSaver.loadBitmap(getContext());
         glyphs = new Glyphs(builderAndSaver.getBitmap());
+        setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+        setTextSize(26f);
+        setLineSpacing(0, .8f);
+        setTextColor(Color.WHITE);
     }
 
     @Override
@@ -38,25 +46,35 @@ public class CustomEditText extends AppCompatEditText {
         super.onTextChanged(text, start, lengthBefore, lengthAfter);
 //        Log.d("onTextChanged()", text.toString());
     }
-
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
         canvas.drawColor(Color.WHITE);
         int glyphPacking = (int) (getWidth() / (Glyphs.CHAR_BITMAP_WIDTH*TEXT_SIZE))-1;
-        String result = getText().toString();
+
+
+        Log.d("draw()", String.valueOf(getSelectionStart()));
+        glyphs.drawString(canvas, packWordsOneWay(getText().toString(), glyphPacking), getSelectionStart(),10, 30, TEXT_SIZE);
+    }
+
+    private String packWordsOneWay(String text, int glyphPacking) {
         int counter = 0;
-        for(int i = 0; i < result.length(); i++) {
-            if(result.charAt(i) == '\n')
+        for(int i = 0; i < text.length(); i++) {
+            if(text.charAt(i) == '\n')
                 counter = 0;
             if(counter == glyphPacking) {
-               result = result.substring(0, i) + "\n" + result.substring(i);
-               counter = 0;
-           }
-           counter++;
+                if(text.charAt(i) != ' ') {
+                    if(text.lastIndexOf(' ') == -1)
+                        text = text.substring(0, i) + "\n" + text.substring(i);
+                    else
+                        text = text.substring(0, text.substring(0, i).lastIndexOf(' ')) + "\n" + text.substring(text.substring(0, i).lastIndexOf(' ')+1);
+                } else {
+                    text = text.substring(0, i) + "\n" + text.substring(i+1);
+                }
+                counter = 0;
+            }
+            counter++;
         }
-
-        Log.d("draw()",result);
-        glyphs.drawString(canvas, result, 0, 0, TEXT_SIZE);
+        return text;
     }
 }
