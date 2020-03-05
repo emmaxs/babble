@@ -34,14 +34,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"
-            android:launchMode="singleTask">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="yw.main.babble.MainActivity" />
-        </activity>
         <activity android:name=".font.FontDrawActivity" />
         <activity
             android:name=".SignUpActivity"

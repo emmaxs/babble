@@ -160,19 +160,22 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                         switch (mode) {
                             case NEW_NOTE:
                                 newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
-//                                if (wifiConnection()) {
+                                if (wifiConnection()) {
                                     db.collection("users").document(userId)
                                             .collection("notes").add(newNote);
-//                                }
+                                }
                                 break;
                             case UPDATE_NOTE:
-//                                if (wifiConnection()) {
+                                if (wifiConnection()) {
                                     DocumentReference notesRef = db.collection("users").document(userId)
                                             .collection("notes").document(docId);
                                     Map<String,Object> updates = new HashMap<>();
                                     updates.put("id", docId);
                                     updates.put("content", content);
                                     updates.put("title", title);
+                                    updates.put("latitude", currentLatitude);
+                                    updates.put("longitude", currentLongitude);
+                                    updates.put("emotion", detectedTone);
                                     updates.put("timestamp", FieldValue.serverTimestamp());
                                     notesRef.update(updates)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -187,7 +190,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                                                     Log.w("EXS", "Error updating document", e);
                                                 }
                                             });
-//                                }
+                                }
                                 break;
                         }
 
@@ -218,20 +221,20 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         //TODO: change theme (use sharedprefs)
     }
 
-//    // check wifi connection
-//    private boolean wifiConnection() {
-//        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+    // check wifi connection
+    private boolean wifiConnection() {
+        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 //        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
 //            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
 //            if( wifiInfo.getNetworkId() == -1 ){
 //                return false; // not connected to access point
 //            }
-//            return true; // connected to access point
+            return true; // connected to access point
 //        }
 //        else {
 //            return false; // Wi-Fi is off
 //        }
-//    }
+    }
 
     private void initLocationManager(){
         try {
