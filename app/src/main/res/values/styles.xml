@@ -16,13 +16,35 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="JournalTheme" >
+    <style name="JournalTheme" parent="Theme.AppCompat" >
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@drawable/paper1</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">#000000</item>
     </style>
-
+    <style name = "HeartsTheme" parent="Theme.AppCompat" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">#BC7C9C</item>
+        <item name = "android:textColor">#FFADC6</item>
+        <item name="colorButtonNormal">#A74482</item>
+        <item name="colorPrimaryDark">#A74482</item>
+        <item name="colorAccent">#FF4081</item>
+        <item name="colorBackgroundFloating">#693668</item>
+        <item name="android:navigationBarColor">#A74482</item>
+        <item name="colorPrimary">#E2C2C6</item>
+    </style>
+    <style name = "NavalTheme" parent="Theme.AppCompat" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">#1B1B3A</item>
+        <item name = "android:textColor">#E0DECE</item>
+        <item name="colorButtonNormal">#28666E</item>
+        <item name="colorPrimaryDark">#1B1B3A</item>
+        <item name="colorAccent">#F2AF29</item>
+        <item name="colorBackgroundFloating">#253031</item>
+        <item name="android:navigationBarColor">#28666E</item>
+    </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
