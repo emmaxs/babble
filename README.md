@@ -6,9 +6,9 @@ Babble is your digital journaling companion. Save your journal entries in the cl
 Here is the pitch we presented in [class](https://docs.google.com/presentation/d/1AgNdRpJ33MOCTNdOaCXMMCWwGBiSXf-ggASJ9gaZj_Q/edit?usp=sharing).
 
 ### Team Effort Breakdown
-* Emma Sampugnaro - Basic App Functionality, Watson ML Sentiment Analysis, Product Management
-* Addison Wessel - Handwriting to Font, Drawable Interface
-* Leah Ryu - Login/Signup Authentication, Firebase Storage, UI Design, 
+* Emma Sampugnaro - Firebase Database and Storage, Watson ML Sentiment Analysis, Product Management
+* Addison Wessel - Handwriting to Font, Drawable Interface, UI
+* Leah Ryu - Login/Signup Authentication, UI/Design, 
 
 Responsibilty to be determined: Location services and AR to see snippets of the sentiments being created around you.
 
