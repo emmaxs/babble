@@ -46,7 +46,7 @@ public class SignUpActivity extends AppCompatActivity {
         signupButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
                 String email = new_email.getText().toString();
-                String password = new_email.getText().toString();
+                String password = new_password.getText().toString();
 
                 // if a field is empty, throw up a dialog
                 if (email.equals("") || password.equals("")) {
