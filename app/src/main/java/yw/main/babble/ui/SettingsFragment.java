@@ -100,7 +100,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
 
         // open intent for Account delete
-        Preference preference2 = findPreference("pref2");
+        Preference preference2 = findPreference("deleteAccount");
         preference2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -151,7 +151,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
 
         // Log out
-        Preference preference3 = findPreference("pref3");
+        Preference preference3 = findPreference("logOut");
         preference3.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -164,7 +164,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
 
         // open intent for default_font draw
-        Preference preference4 = findPreference("pref4");
+        Preference preference4 = findPreference("openFontDraw");
         preference4.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -176,7 +176,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         // TODO
         // open intent for themes change
-        Preference preference5 = findPreference("pref5");
+        Preference preference5 = findPreference("changeTheme");
         preference5.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
