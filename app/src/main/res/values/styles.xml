@@ -25,7 +25,6 @@
     <style name = "HeartsTheme" parent="Theme.AppCompat" >
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-
         <item name = "android:textColor">#FFADC6</item>
         <item name="colorButtonNormal">#A74482</item>
         <item name="colorPrimaryDark">#A74482</item>
@@ -37,7 +36,6 @@
     <style name = "NavalTheme" parent="Theme.AppCompat" >
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">#1B1B3A</item>
         <item name = "android:textColor">#E0DECE</item>
         <item name="colorButtonNormal">#28666E</item>
         <item name="colorPrimaryDark">#1B1B3A</item>
