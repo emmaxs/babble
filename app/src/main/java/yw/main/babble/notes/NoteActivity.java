@@ -145,13 +145,13 @@ public class NoteActivity extends AppCompatActivity {
                         switch (mode) {
                             case NEW_NOTE:
                                 newNote = new NotesBuilder(title, content, detectedTone, 0.0, 0.0);
-                                if (wifiConnection()) {
+//                                if (wifiConnection()) {
                                     db.collection("users").document(userId)
                                             .collection("notes").add(newNote);
-                                }
+//                                }
                                 break;
                             case UPDATE_NOTE:
-                                if (wifiConnection()) {
+//                                if (wifiConnection()) {
                                     DocumentReference notesRef = db.collection("users").document(userId)
                                             .collection("notes").document(docId);
                                     Map<String,Object> updates = new HashMap<>();
@@ -171,7 +171,7 @@ public class NoteActivity extends AppCompatActivity {
                                                     Log.w("EXS", "Error updating document", e);
                                                 }
                                             });
-                                }
+//                                }
                                 break;
                         }
 
@@ -202,18 +202,18 @@ public class NoteActivity extends AppCompatActivity {
         //TODO: change theme (use sharedprefs)
     }
 
-    // check wifi connection
-    private boolean wifiConnection() {
-        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
-            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-            if( wifiInfo.getNetworkId() == -1 ){
-                return false; // not connected to access point
-            }
-            return true; // connected to access point
-        }
-        else {
-            return false; // Wi-Fi is off
-        }
-    }
+//    // check wifi connection
+//    private boolean wifiConnection() {
+//        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
+//            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+//            if( wifiInfo.getNetworkId() == -1 ){
+//                return false; // not connected to access point
+//            }
+//            return true; // connected to access point
+//        }
+//        else {
+//            return false; // Wi-Fi is off
+//        }
+//    }
 }
