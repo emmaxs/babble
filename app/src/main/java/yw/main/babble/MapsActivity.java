@@ -96,6 +96,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double lat = location.getLatitude();
         double lng = location.getLongitude();
 
+        while (mMap == null) {
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {}
+        }
+
         if (locationMarker != null)
                 locationMarker.remove();
 
