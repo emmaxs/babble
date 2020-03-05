@@ -225,16 +225,16 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
     // check wifi connection
     private boolean wifiConnection() {
         WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
-//            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-//            if( wifiInfo.getNetworkId() == -1 ){
-//                return false; // not connected to access point
-//            }
+        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
+            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+            if( wifiInfo.getNetworkId() == -1 ){
+                return false; // not connected to access point
+            }
         return true; // connected to access point
-//        }
-//        else {
-//            return false; // Wi-Fi is off
-//        }
+        }
+        else {
+            return false; // Wi-Fi is off
+        }
     }
 
     private void initLocationManager(){

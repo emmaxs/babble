@@ -78,7 +78,7 @@ public class SignUpActivity extends AppCompatActivity {
                              */
                             // wrong pass
                             if (e instanceof FirebaseAuthInvalidCredentialsException){
-                                builder.setMessage("Please enter a valid email address!");
+                                builder.setMessage("Please enter a valid email address and a password longer than 6 characters!");
                             }
                             // wrong user
                             else if (e instanceof FirebaseAuthUserCollisionException){
