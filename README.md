@@ -6,9 +6,9 @@ Babble is your digital journaling companion. Save your journal entries in the cl
 Here is the pitch we presented in [class](https://docs.google.com/presentation/d/1AgNdRpJ33MOCTNdOaCXMMCWwGBiSXf-ggASJ9gaZj_Q/edit?usp=sharing).
 
 ### Team Effort Breakdown
-* Emma Sampugnaro - Basic App Functionality, Watson ML Sentiment Analysis, Product Management
-* Addison Wessel - Handwriting to Font, Drawable Interface
-* Leah Ryu - Login/Signup Authentication, Firebase Storage, UI Design, 
+* Emma Sampugnaro - Firebase Database and Storage, Watson ML Sentiment Analysis, Product Management
+* Addison Wessel - Handwriting to Font, Drawable Interface, UI
+* Leah Ryu - Login/Signup Authentication, UI/Design, 
 
 Responsibilty to be determined: Location services and AR to see snippets of the sentiments being created around you.
 
@@ -17,6 +17,9 @@ Here is a link to the MVC and Threading Diagram we presented during [Show and Te
 
 ### APK
 APK Release Date: March 6th, 2019. 
+
+### Known Issues
+We are using Google firebase authentication, and for some reason, after you make sign-up through the app and make an account, the first time you logout, it doesn't recognize your password until you reset it. To test the login functionality while we are debugging, feel free to use the account `test@gmail.com` with `tester1` as the password.
 
 ### Demo Day Presentation
 Coming soon.
