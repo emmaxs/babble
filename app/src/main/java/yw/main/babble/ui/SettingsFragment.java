@@ -163,7 +163,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        // open intent for font draw
+        // open intent for default_font draw
         Preference preference4 = findPreference("pref4");
         preference4.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
