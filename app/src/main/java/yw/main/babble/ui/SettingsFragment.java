@@ -181,12 +181,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 // TODO: themes
-                ThemeChangeFragment themeFrag= new ThemeChangeFragment();
+                Intent intent = new Intent(getActivity(), ThemeChangeActivity.class);
+                startActivity(intent);
+
+                /*ThemeChangeFragment themeFrag= new ThemeChangeFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(((ViewGroup)getView().getParent()).getId(),themeFrag,"tag");
+                fragmentTransaction.replace(R.id.drawer_layout,themeFrag,"tag");
                 fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                fragmentTransaction.commit();*/
                 return true;
             }
         });

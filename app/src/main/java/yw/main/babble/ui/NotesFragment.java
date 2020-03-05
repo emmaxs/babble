@@ -57,6 +57,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import yw.main.babble.LoginActivity;
 import yw.main.babble.font.FontDrawActivity;
 import yw.main.babble.notes.NoteActivity;
 import yw.main.babble.notes.NotesAdapter;
@@ -81,7 +82,6 @@ public class NotesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // get app-wide shared prefs
     }
 
     public int dpToPx(int dp) {
@@ -99,130 +99,136 @@ public class NotesFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
 
-        if (firebaseUser != null)
+        if (firebaseUser != null) {
             userId = firebaseUser.getUid();
 
-        db = FirebaseFirestore.getInstance();
+            db = FirebaseFirestore.getInstance();
 
-        // TODO: Add Snackbar
-        FloatingActionButton fab = root.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(getActivity(), NoteActivity.class);
-                startActivityForResult(myIntent, NotesFragment.SAVE_ENTRY);
-            }
-        });
+            // TODO: Add Snackbar
+            FloatingActionButton fab = root.findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent myIntent = new Intent(getActivity(), NoteActivity.class);
+                    startActivityForResult(myIntent, NotesFragment.SAVE_ENTRY);
+                }
+            });
 
-        listView = root.findViewById(R.id.notes);
+            listView = root.findViewById(R.id.notes);
 
-        // DB
-        db.collection("users").document(userId)
-                .collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                notesList = new ArrayList<>();
-                if(task.isSuccessful()){
-                    for(QueryDocumentSnapshot document : task.getResult()) {
-                        NotesBuilder note = document.toObject(NotesBuilder.class);
-                        notesList.add(note);
+            SwipeMenuCreator creator = new SwipeMenuCreator() {
+                @Override
+                public void create(SwipeMenu menu) {
+                    // create "delete" item
+                    SwipeMenuItem deleteItem = new SwipeMenuItem(
+                            getActivity().getApplicationContext());
+                    // set item background
+                    deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                            0x3F, 0x25)));
+                    // set item width
+                    deleteItem.setWidth(dpToPx(120));
+                    // set a icon
+                    deleteItem.setIcon(android.R.drawable.ic_delete);
+                    // add to menu
+                    menu.addMenuItem(deleteItem);
+                }
+            };
+
+            // set creator
+            listView.setMenuCreator(creator);
+            listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+            loadFirebase();
+
+            // do the notes list
+            prepareNotes();
+
+            // set adapter
+            nAdapter = new NotesAdapter(notesList, getActivity());
+            listView.setAdapter(nAdapter);
+
+            // set listener for swipe actions
+            listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                    switch (index) {
+                        case 0:
+                            // Delete from adapter
+                            nAdapter.remove(position);
+                            nAdapter.notifyDataSetChanged();
+
+                            // Delete local files
+                            String filename = "Note" + position + ".txt";
+                            File dir = getActivity().getFilesDir();
+                            File file = new File(dir, filename);
+                            file.delete();
+
+
+                            break;
                     }
-                    // set adapter
-                    nAdapter = new NotesAdapter(notesList, getActivity());
-                    listView.setAdapter(nAdapter);
-                } else {
-                    Log.d("exs", "Error getting documents: ", task.getException());
+                    // false : close the menu; true : not close the menu
+                    return false;
                 }
-            }
-        });
+            });
 
-        SwipeMenuCreator creator = new SwipeMenuCreator() {
-            @Override
-            public void create(SwipeMenu menu) {
-                // create "delete" item
-                SwipeMenuItem deleteItem = new SwipeMenuItem(
-                        getActivity().getApplicationContext());
-                // set item background
-                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
-                        0x3F, 0x25)));
-                // set item width
-                deleteItem.setWidth(dpToPx(120));
-                // set a icon
-                deleteItem.setIcon(android.R.drawable.ic_delete);
-                // add to menu
-                menu.addMenuItem(deleteItem);
-            }
-        };
-
-        // set creator
-        listView.setMenuCreator(creator);
-        listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-
-
-        // set listener for swipe actions
-        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                switch (index) {
-                    case 0:
-                        // Delete from adapter
-                        nAdapter.remove(position);
-                        nAdapter.notifyDataSetChanged();
-
-                        // Delete local files
-                        String filename = "Note" + position + ".txt";
-                        File dir = getActivity().getFilesDir();
-                        File file = new File(dir, filename);
-                        file.delete();
-
-
-                        break;
+            // Get a more detailed view on any clicked item in the list
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView adapterView, View view, int position, long id) {
+                    Intent intent;
+                    intent = new Intent(getActivity(), NoteActivity.class);
+                    // This will change once we have a real db
+                    intent.putExtra(NOTE_INDEX, position);
+                    startActivityForResult(intent, SAVE_ENTRY);
                 }
-                // false : close the menu; true : not close the menu
-                return false;
-            }
-        });
+            });
 
-        // Get a more detailed view on any clicked item in the list
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView adapterView, View view, int position, long id) {
-                Intent intent;
-                intent = new Intent(getActivity(), NoteActivity.class);
-                // This will change once we have a real db
-                intent.putExtra(NOTE_INDEX, position);
-                startActivityForResult(intent, SAVE_ENTRY);
-            }
-        });
+        }
 
         return root;
     }
 
+    // old version
+    private void prepareNotes() {
+        File directory;
+        directory = getActivity().getFilesDir();
+        File[] files = directory.listFiles();
+        String theFile;
 
-//    private void loadFirebase() {
-//        DocumentReference docRef = db.collection("notes").document(userId);
-//        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable DocumentSnapshot snapshot,
-//                                @Nullable FirebaseFirestoreException e) {
-//                if (e != null) {
-//                    Log.w("Emma", "Listen failed.", e);
-//                    return;
-//                }
-//
-//                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
-//                        ? "Local" : "Server";
-//
-//                if (snapshot != null && snapshot.exists()) {
-//                    Log.d("Emma", source + " data: " + snapshot.getData());
-//                } else {
-//                    Log.d("Emma", source + " data: null");
-//                }
-//            }
-//        });
-//    }
+        Log.d("exs", "File length is " + files.length);
+
+        for (int f = 1; f <= files.length; f++) {
+            theFile = "Note" + f + ".txt";
+            NotesBuilder note = new NotesBuilder(theFile, Open(theFile));
+            notesList.add(note);
+        }
+    }
+
+    private void loadFirebase() {
+        DocumentReference docRef = db.collection("notes").document(userId);
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("Emma", "Listen failed.", e);
+                    return;
+                }
+
+                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
+                        ? "Local" : "Server";
+
+                if (snapshot != null && snapshot.exists()) {
+                    Log.d("Emma", source + " data: " + snapshot.getData());
+                } else {
+                    Log.d("Emma", source + " data: null");
+                }
+            }
+        });
+    }
 
     public void onDataSetChanged() {
         notesList.clear();
+        prepareNotes();
         nAdapter.notifyDataSetChanged();
     }
 

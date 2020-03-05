@@ -20,7 +20,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@drawable/paper1</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

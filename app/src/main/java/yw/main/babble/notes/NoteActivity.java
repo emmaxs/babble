@@ -59,7 +59,6 @@ public class NoteActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String userId;
 
-    SharedPreferences sharedPreferences;
     private String detectedTone;
 
     // for app-wide shared prefs
@@ -75,9 +74,6 @@ public class NoteActivity extends AppCompatActivity {
 
         //TODO: switch theme
         setTheme(R.style.JournalTheme);
-
-        // get app-wide shared prefs
-        sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
 
         editText = findViewById(R.id.EditText);
         intent = getIntent();
@@ -176,8 +172,7 @@ public class NoteActivity extends AppCompatActivity {
 
         // saving to firebase if wifi is good
         if (wifiConnection()) {
-            db.collection("users").document(userId)
-                    .collection("notes").add(newNote);
+            db.collection("notes").document(userId).set(newNote);
         }
     }
 
