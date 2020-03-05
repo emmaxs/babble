@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.util.Log;
 
@@ -11,14 +13,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import yw.main.babble.R;
+
 public class BitmapBuilderAndSaver {
-    private static final String FILE_NAME = "font.png";
+    private static final String FILE_NAME = "default_fontult_font.png";
     private Bitmap bitmap = null;
     public BitmapBuilderAndSaver() {
 
     }
 
-    // TODO: save font to firebase
+    // TODO: save default_font to firebase
     public boolean saveBitmap(Context context) {
         //TODO: FIX EACCES PERMISSION DENIED ERROR
         try {
@@ -42,7 +46,10 @@ public class BitmapBuilderAndSaver {
             Log.e("loadBitmap()", e.getMessage());
             if(e.getMessage().contains("No such file or directory")) {
                 Log.d("loadBitmap()", "Creating new bitmap...");
-                bitmap = Glyphs.getEmptyBitmap();
+                Drawable d = context.getResources().getDrawable(R.drawable.default_font);
+                if(d instanceof BitmapDrawable) {
+                    bitmap = ((BitmapDrawable) d).getBitmap();
+                }
             }
         }
     }
