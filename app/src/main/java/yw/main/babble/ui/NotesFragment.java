@@ -128,28 +128,6 @@ public class NotesFragment extends Fragment {
             userId = firebaseUser.getUid();
 
             db = FirebaseFirestore.getInstance();
-            notesList = new ArrayList<>();
-
-            // DB
-//            db.collection("users").document(userId)
-//                    .collection("notes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                @Override
-//                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                    notesList = new ArrayList<>();
-//                    if (task.isSuccessful()) {
-//                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                            NotesBuilder note = document.toObject(NotesBuilder.class);
-//                            note.setId(document.getId());
-//                            notesList.add(note);
-//                        }
-//                        // set adapter
-//                        nAdapter = new NotesAdapter(notesList, getActivity());
-//                        listView.setAdapter(nAdapter);
-//                    } else {
-//                        Log.d("exs", "Error getting documents: ", task.getException());
-//                    }
-//                }
-//            });
 
             // Listen for DB changes
             db.collection("users").document(userId)
@@ -163,7 +141,7 @@ public class NotesFragment extends Fragment {
                                 return;
                             }
 
-                            List<String> cities = new ArrayList<>();
+                            notesList = new ArrayList<>();
                             for (QueryDocumentSnapshot doc : value) {
                                 NotesBuilder note = doc.toObject(NotesBuilder.class);
                                 note.setId(doc.getId());
