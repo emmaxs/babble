@@ -1,16 +1,15 @@
 package yw.main.babble.notes;
 
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.ServerTimestamp;
-
-import java.util.Date;
 
 public class NotesBuilder {
 
     private String title, emotion,
-            content;
+            content, id;
     private Double latitude;
     private Double longitude;
-    @ServerTimestamp private Date date;
+    @ServerTimestamp private FieldValue timestamp;
 
     // EMOTION CONSTANTS
     public static final String JOY = "JOY";
@@ -29,6 +28,22 @@ public class NotesBuilder {
         this.content = content;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public FieldValue getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(FieldValue timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public NotesBuilder(String title, String content, String emotion, Double latitude, Double longitude) {
         this.title = title;
         this.content = content;
@@ -36,6 +51,7 @@ public class NotesBuilder {
         // possibly make geopoint
         this.latitude =latitude;
         this.longitude = longitude;
+        this.timestamp = FieldValue.serverTimestamp();
     }
 
     public String getTitle() {
