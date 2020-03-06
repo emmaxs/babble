@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 import yw.main.babble.R;
+import yw.main.babble.ui.ThemeChangeFragment;
 
 import static yw.main.babble.ui.NotesFragment.CONTENT;
 import static yw.main.babble.ui.NotesFragment.ID;
@@ -101,9 +102,25 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //TODO: switch theme
-//        setTheme(R.style.JournalTheme);
-
+        checkPermissions();
+        // setting theme
+        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        switch(theme){
+            case "HeartsTheme":
+                setTheme(R.style.HeartsTheme);
+                break;
+            case "JournalTheme":
+                setTheme(R.style.JournalTheme);
+                break;
+            case "NauticalTheme":
+                setTheme(R.style.NavalTheme);
+                break;
+            case "DefaultTheme":
+                setTheme(R.style.DefaultTheme);
+                break;
+            case "":
+                break;
+        }
         // get app-wide shared prefs
         sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
 
@@ -116,7 +133,6 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
             // set the mode
             mode = UPDATE_NOTE;
             docId = intent.getStringExtra(ID);
-            // TODO: Do something with title
             title = intent.getStringExtra(TITLE);
             // Set the content of the edit text
             editText.setText(intent.getStringExtra(CONTENT));
@@ -242,6 +258,25 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
     public void onResume(){
         super.onResume();
         //TODO: change theme (use sharedprefs)
+        // setting theme
+        // setting theme
+        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        switch(theme){
+            case "HeartsTheme":
+                setTheme(R.style.HeartsTheme);
+                break;
+            case "JournalTheme":
+                setTheme(R.style.JournalTheme);
+                break;
+            case "NauticalTheme":
+                setTheme(R.style.NavalTheme);
+                break;
+            case "DefaultTheme":
+                setTheme(R.style.DefaultTheme);
+                break;
+            case "":
+                break;
+        }
     }
 
 
@@ -265,6 +300,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         // location object gets you current latitude and long of phone
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
+        Log.d("EXS", "Lat: " + currentLatitude + "Long: " + currentLongitude);
     }
 
     public void onDestroy(){

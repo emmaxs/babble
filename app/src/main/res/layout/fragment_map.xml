@@ -5,6 +5,24 @@
     android:layout_height="match_parent"
     tools:context=".ui.MapFragment">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:id="@+id/chartTitle"
+        android:text="@string/chartTitle"/>
+
+    <lecho.lib.hellocharts.view.ColumnChartView
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="75dp"
+        android:layout_below="@+id/chartTitle"/>
+
     <Button
         android:id="@+id/open_map_button"
         android:layout_width="match_parent"

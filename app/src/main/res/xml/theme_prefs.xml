@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.ThemeChangeFragment" >
+    tools:context=".ui.ThemeChangeFragment"
+    android:iconSpaceReserved="false">
 
-    <PreferenceCategory android:title="@string/themes">
+    <PreferenceCategory android:title="@string/themes"
+        android:iconSpaceReserved="false">
 
-        <Preference>
+        <Preference
+            android:iconSpaceReserved="false"
+            android:key="default"
+            android:title="@string/default_theme" />
+
+        <Preference
+            android:iconSpaceReserved="false"
             android:key="paper"
-            android:title="@string/paper_theme"
-        </Preference>
+            android:title="@string/paper_theme" />
 
-        <Preference>
-            android:key="hello_kitty"
-            android:title="@string/hello_kitty"
+        <Preference
+            android:iconSpaceReserved="false"
+            android:key="hearts"
+            android:title="@string/hearts" />
 
-        </Preference>
+        <Preference
+            android:iconSpaceReserved="false"
+            android:key="nautical"
+            android:title="@string/nautical" />
     </PreferenceCategory>
 
 </PreferenceScreen>

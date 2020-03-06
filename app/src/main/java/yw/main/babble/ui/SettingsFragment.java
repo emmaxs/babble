@@ -18,6 +18,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -35,11 +36,9 @@ import yw.main.babble.font.FontDrawActivity;
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-    SharedPreferences sharedPreferences;
-    FirebaseAuth firebaseAuth;
-    FirebaseUser firebaseUser;
-    private String password_old;
-    private String email;
+    private SharedPreferences sharedPreferences;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,38 +57,93 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                // TODO: try dialog fragment
-                // makeAlertDialog();
-                firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                // pop up a dialog asking for old password
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogStyle);
+                builder.setTitle("Enter your old password.");
+                EditText editText = new EditText(getActivity());
+                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                builder.setView(editText);
 
-                // need to reauthenticate -- only need user to input password
-                email = firebaseUser.getEmail();
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                //
-                AuthCredential authCredential = EmailAuthProvider
-                        .getCredential(email, "password");
+                        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                // now must reauthenticate
-                firebaseUser.reauthenticate(authCredential)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    firebaseUser.updatePassword("something").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                Log.d("tag", "Password updated");
-                                            } else {
-                                                Log.d("tag2", "Error password not updated");
-                                            }
+                        // need to reauthenticate -- only need user to input password
+                        String email = firebaseUser.getEmail();
+                        String pass = editText.getText().toString();
+
+                        //
+                        AuthCredential authCredential = EmailAuthProvider
+                                .getCredential(email, pass);
+
+                        // now try reauthentication
+                        firebaseUser.reauthenticate(authCredential)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+
+                                        // if task successful, need yet another alert dialog
+                                        if (task.isSuccessful()) {
+
+                                            // pop up a dialog asking for new password
+                                            AlertDialog.Builder sub_builder = new AlertDialog.Builder(getActivity(), R.style.DialogStyle);
+                                            sub_builder.setTitle("Enter a new password.");
+                                            EditText sub_editText = new EditText(getActivity());
+                                            sub_editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                                            sub_builder.setView(sub_editText);
+
+                                            sub_builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+                                                public void onClick(DialogInterface dialog, int which){
+                                                    String new_pass = sub_editText.getText().toString();
+                                                    firebaseUser.updatePassword(new_pass).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                Log.d("tag", "Password updated");
+                                                                Toast.makeText(getActivity(),
+                                                                        "Success! Password updated.",
+                                                                        Toast.LENGTH_LONG).show();
+                                                            } else {
+                                                                Log.d("tag2", "Error password not updated");
+                                                                Toast.makeText(getActivity(),
+                                                                        "Something went wrong.",
+                                                                        Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            });
+
+                                            sub_builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener(){
+                                                public void onClick(DialogInterface dialog, int which){
+                                                    dialog.cancel();
+                                                }
+                                            });
+
+                                            AlertDialog sub_dialog = sub_builder.create();
+                                            sub_dialog.show();
+
+                                        } else {
+                                            // just make a toast for wrong password
+                                            Log.d("tag", "Error auth failed");
+                                            Toast.makeText(getActivity(), "Wrong password entered.",
+                                                    Toast.LENGTH_SHORT).show();
                                         }
-                                    });
-                                } else {
-                                    Log.d("tag", "Error auth failed");
-                                }
-                            }
-                        });
+                                    }
+                                });
+                    }
+                });
+
+                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
                 return true;
             }
         });
@@ -102,33 +156,71 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 // TODO
                 // make alert dialog, on ok click delete account
 
-                /*AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Theme_AppCompat_Dialog_Alert);
-                builder.setTitle("Are you sure you want to delete your Babble account?");
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogStyle);
+                builder.setTitle(" Are you sure about deleting your Babble account?");
 
+                // User clicked yes
                 builder.setPositiveButton("YES",new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // delete user
-                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        AuthCredential credential = EmailAuthProvider
-                                .getCredential("", "");
 
                         // Prompt the user to re-provide their sign-in credentials
-                        user.reauthenticate(credential)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        user.delete()
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if (task.isSuccessful()) {
-                                                            Log.d("tag", "account deleted");
-                                                        }
-                                                    }
-                                                });
-                                    }
-                                });
+                        // i.e. make another dialog asking for password
+                        AlertDialog.Builder sub_builder = new AlertDialog.Builder(getActivity(), R.style.DialogStyle);
+                        sub_builder.setTitle("Enter your password.");
+                        EditText editText = new EditText(getActivity());
+                        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        sub_builder.setView(editText);
+
+                        sub_builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // delete user
+                                firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                                // get email and password for credentials
+                                String user_email = firebaseUser.getEmail();
+                                String pass = editText.getText().toString();
+                                AuthCredential credential = EmailAuthProvider
+                                        .getCredential(user_email, pass);
+
+                                firebaseUser.reauthenticate(credential)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                firebaseUser.delete()
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Log.d("tag", "account deleted");
+                                                                    Toast.makeText(getContext(),
+                                                                            "Success.",
+                                                                            Toast.LENGTH_LONG).show();
+                                                                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                                                                    startActivity(intent);
+                                                                }
+                                                                else{
+                                                                    Toast.makeText(getContext(),
+                                                                            "Something went wrong. Try again.",
+                                                                            Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            }
+                                                        });
+                                            }
+                                        });
+                            }
+                        });
+
+                        sub_builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        AlertDialog sub_dialog = sub_builder.create();
+                        sub_dialog.show();
                     }
                 });
 
@@ -140,7 +232,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 });
 
                 AlertDialog dialog = builder.create();
-                dialog.show();*/
+                dialog.show();
                 return true;
             }
         });
@@ -169,48 +261,18 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        // TODO
         // open intent for themes change
         Preference preference5 = findPreference("changeTheme");
         preference5.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 // TODO: themes
-                ThemeChangeFragment themeFrag= new ThemeChangeFragment();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(((ViewGroup)getView().getParent()).getId(),themeFrag,"tag");
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                Intent intent = new Intent(getActivity(), ThemeChangeActivity.class);
+                startActivity(intent);
                 return true;
             }
         });
 
-    }
-
-    public void makeAlertDialog(){
-        // put a dialog box here asking for password
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.Theme_AppCompat_Dialog_Alert);
-        builder.setTitle("Enter your old password.");
-        final EditText editText = new EditText(getActivity());
-        editText.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(editText);
-
-        builder.setPositiveButton("OK",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                password_old = editText.getText().toString();
-            }
-        });
-
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     // method to open the login activity
