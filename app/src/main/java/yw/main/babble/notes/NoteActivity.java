@@ -102,6 +102,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        checkPermissions();
         // setting theme
         String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
         switch(theme){
@@ -120,7 +121,6 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
             case "":
                 break;
         }
-
         // get app-wide shared prefs
         sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
 
@@ -133,7 +133,6 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
             // set the mode
             mode = UPDATE_NOTE;
             docId = intent.getStringExtra(ID);
-            // TODO: Do something with title
             title = intent.getStringExtra(TITLE);
             // Set the content of the edit text
             editText.setText(intent.getStringExtra(CONTENT));
@@ -301,6 +300,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         // location object gets you current latitude and long of phone
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
+        Log.d("EXS", "Lat: " + currentLatitude + "Long: " + currentLongitude);
     }
 
     public void onDestroy(){
