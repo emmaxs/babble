@@ -11,27 +11,51 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+
+import yw.main.babble.notes.NotesBuilder;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
+    private FirebaseFirestore db;
     LocationManager locationManager;
     private static final int PERMISSIONS_REQUEST = 2;
     private boolean isMapZoomed = false;
     private Marker locationMarker;
     CameraUpdate cameraUpdate;
     public static final String ZOOM_STATUS = "zoom_status";
+    ArrayList<MarkerOptions> emotionMarkerOptions;
+    ArrayList<Marker> emotionMarkers;
+
+    // EMOTION CONSTANTS
+    public static final String JOY = "JOY";
+    public static final String FEAR = "FEAR";
+    public static final String SADNESS = "SADNESS";
+    public static final String UNKNOWN = "UNKNOWN";
+    public static final String TENTATIVE = "TENTATIVE";
+    public static final String ANALYTICAL = "ANALYTICAL";
+    public static final String CONFIDENT = "CONFIDENT";
+    public static final String ANGER = "ANGER";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +73,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // If you have already been restarted
         if (savedInstanceState != null) {
             isMapZoomed = savedInstanceState.getBoolean(ZOOM_STATUS);
-            // TODO: check if markers clear or not
         }
     }
 
@@ -72,7 +95,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // TODO: Async task to get all the emotions/locations
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                db = FirebaseFirestore.getInstance();
+                db.collectionGroup("notes").get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                // ...
+                                emotionMarkerOptions = new ArrayList<>();
+                                // Keep list of ones to toss
+                                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                                    NotesBuilder note = doc.toObject(NotesBuilder.class);
+                                    // Zero is the default value
+                                    if (note.getLatitude() != 0 || note.getLongitude() != 0) {
+                                        LatLng latLng = new LatLng(note.getLatitude(), note.getLongitude());
+                                        // Make a new marker object from this note
+                                        emotionMarkerOptions.add(createMarker(latLng, note.getEmotion()));
+                                    }
+                                }
+                                // Run the toast on UI
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // TODO: Get rid of with read once
+                                        // clear the old list
+                                        if (emotionMarkers != null) {
+                                            for (Marker marker: emotionMarkers) {
+                                                marker.remove();
+                                            }
+                                        }
+                                        emotionMarkers = new ArrayList<>();
+                                        for (MarkerOptions marker: emotionMarkerOptions) {
+                                            emotionMarkers.add(mMap.addMarker(marker));
+                                        }
+                                    }
+                                });
+                            }
+                        });
+            }
+        });
     }
 
     private void initLocationManager(){
@@ -118,6 +181,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         // Move the camera
         mMap.animateCamera(cameraUpdate);
+    }
+
+    // Create a marker based on the emotion
+    public MarkerOptions createMarker(LatLng latLng, String emotion) {
+        switch (emotion) {
+            case JOY:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(JOY)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.joy));
+            case SADNESS:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(SADNESS)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.sadness));
+            case FEAR:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(FEAR)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.fear));
+            case ANGER:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(ANGER)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.anger));
+            case TENTATIVE:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(TENTATIVE)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.tentative));
+            case ANALYTICAL:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(ANALYTICAL)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.analytical));
+            case CONFIDENT:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(CONFIDENT)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.confident));
+            default:
+                return new MarkerOptions()
+                        .position(latLng)
+                        .title(UNKNOWN)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.unknown));
+        }
     }
 
     public void onDestroy(){

@@ -65,14 +65,14 @@ public class MapFragment extends Fragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_map, container, false);
 
-        // Maybe remove this button
-//        (root.findViewById(R.id.open_map_button)).setOnClickListener(new Button.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(getActivity(), MapsActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+//         Maybe remove this button
+        (root.findViewById(R.id.open_map_button)).setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), MapsActivity.class);
+                startActivity(intent);
+            }
+        });
         // Get the chart view
         chart = root.findViewById(R.id.chart);
         AsyncTask.execute(new Runnable() {

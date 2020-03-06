@@ -23,11 +23,11 @@
         android:layout_margin="50dp"
         android:layout_below="@+id/chartTitle"/>
 
-<!--    <Button-->
-<!--        android:id="@+id/open_map_button"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/map_button"-->
-<!--        android:layout_alignParentBottom="true" />-->
+    <Button
+        android:id="@+id/open_map_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/map_button"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
