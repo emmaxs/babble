@@ -144,6 +144,11 @@ public class NotesFragment extends Fragment {
             prepareNotes();
 
             // set adapter
+            //TODO for testing purposes
+            // noteslist is a problem somehow
+            notesList = new ArrayList<>();
+
+
             nAdapter = new NotesAdapter(notesList, getActivity());
             listView.setAdapter(nAdapter);
 
