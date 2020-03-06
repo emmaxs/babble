@@ -162,7 +162,7 @@ public class NotesFragment extends Fragment {
                 // set item width
                 deleteItem.setWidth(dpToPx(120));
                 // set a icon
-                deleteItem.setIcon(android.R.drawable.ic_delete);
+                deleteItem.setIcon(R.drawable.delete);
                 // add to menu
                 menu.addMenuItem(deleteItem);
             }

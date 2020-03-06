@@ -6,11 +6,9 @@ Babble is your digital journaling companion. Save your journal entries in the cl
 Here is the pitch we presented in [class](https://docs.google.com/presentation/d/1AgNdRpJ33MOCTNdOaCXMMCWwGBiSXf-ggASJ9gaZj_Q/edit?usp=sharing).
 
 ### Team Effort Breakdown
-* Emma Sampugnaro - Firebase Database and Storage, Watson ML Sentiment Analysis, Product Management
+* Emma Sampugnaro - Firebase Database and Storage, Watson ML Sentiment Analysis, Emotion/Location Displays (Map and Chart)
 * Addison Wessel - Handwriting to Font, Drawable Interface, UI
-* Leah Ryu - Login/Signup Authentication, UI/Design, 
-
-Responsibilty to be determined: Location services and AR to see snippets of the sentiments being created around you.
+* Leah Ryu - Login/Signup Authentication, UI
 
 ### MVC/Threaded Diagram
 Here is a link to the MVC and Threading Diagram we presented during [Show and Tell 1 & 2](https://docs.google.com/presentation/d/1ejdROAu_Ms1Mu4eX_bIxM7x1S3fD2zbaiAfkCbGuQMg/edit?usp=sharing).
