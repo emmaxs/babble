@@ -6,29 +6,82 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Environment;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import yw.main.babble.R;
 
 public class BitmapBuilderAndSaver {
-    private static final String FILE_NAME = "default_fontult_font.png";
     private Bitmap bitmap = null;
+
+    // Firebase
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
+    private String userId;
+    StorageReference storageRef;
+    String filename = "";
+
+    ByteArrayOutputStream baos;
+
+
     public BitmapBuilderAndSaver() {
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
+        if (firebaseUser != null) {
+            userId = firebaseUser.getUid();
+            filename = "users/" + userId + ".png";
+            // Create a storage reference from our app
+            storageRef = FirebaseStorage.getInstance().getReference().child(filename);
+            Log.d("exs", "users/" + userId + ".png");
+        }
 
     }
 
-    // TODO: save default_font to firebase
+    // TODO: Make async
     public boolean saveBitmap(Context context) {
         //TODO: FIX EACCES PERMISSION DENIED ERROR
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), FILE_NAME));
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-            fileOutputStream.close();
+            Log.d("exs", "We are trying to save");
+
+            // FIREBASE from Documentation
+            baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] data = baos.toByteArray();
+
+            UploadTask uploadTask = storageRef.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                    Log.d("exs", "Failed to save bitmap");
+                    try {baos.close();} catch (IOException e) {};
+//                    try {stream.close();} catch (IOException e) {};
+
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                    // ...
+                    Log.d("exs", "Successfully saved bit map");
+                    try {baos.close();} catch (IOException e) {};
+//                    try {stream.close();} catch (IOException e) {};
+                }
+            });
+
             return true;
         } catch (Exception e) {
             Log.e("saveBitmap()", e.getMessage());
@@ -37,21 +90,31 @@ public class BitmapBuilderAndSaver {
     }
 
     public void loadBitmap(Context context) {
-        try {
-            File filePath = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
-            FileInputStream fileInputStream = new FileInputStream(filePath);
-            bitmap = BitmapFactory.decodeStream(fileInputStream);
-            bitmap = Bitmap.createBitmap(bitmap);
-        } catch (Exception e) {
-            Log.e("loadBitmap()", e.getMessage());
-            if(e.getMessage().contains("No such file or directory")) {
-                Log.d("loadBitmap()", "Creating new bitmap...");
+
+            final long ONE_MEGABYTE = 1024 * 1024;
+            storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    // Data for "users/{userId}.png" is returns, use this as needed
+                    Log.d("exs", "Successfully downloaded bit map");
+                    bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    bitmap = Bitmap.createBitmap(bitmap);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d("exs", "Failed to retrieve bitmap");
+                }
+            });
+
+            // If you don't have a bitmap saved, use the default
+            if (bitmap == null) {
                 Drawable d = context.getResources().getDrawable(R.drawable.default_font);
                 if(d instanceof BitmapDrawable) {
                     bitmap = ((BitmapDrawable) d).getBitmap();
                 }
             }
-        }
     }
 
     public void putGlyph(Bitmap character, char letter) {

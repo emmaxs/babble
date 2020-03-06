@@ -24,7 +24,7 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import yw.main.babble.R;
 
 public class FontDrawActivity extends Activity {
-    private BitmapBuilderAndSaver builderAndSaver = new BitmapBuilderAndSaver();
+    private BitmapBuilderAndSaver builderAndSaver;
     private DrawingView dv ;
     private TextView letterHint;
     private int currCharIndex = 0;
@@ -33,6 +33,8 @@ public class FontDrawActivity extends Activity {
         super.onCreate(savedInstanceState);
         setTheme(R.style.HeartsTheme);
         setContentView(R.layout.activity_font_draw);
+
+        builderAndSaver = new BitmapBuilderAndSaver();
         builderAndSaver.loadBitmap(this);
         dv = new DrawingView(this);
         dv.post(new Runnable() {
