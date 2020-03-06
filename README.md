@@ -25,6 +25,7 @@ Coming soon. Note: Github repository is currently set to private.
 ### Acknowlegements
 Used emojis from this [website](https://icons8.com/icon/pack/emoji/emoji).
 Used QuadFlask's color picker dialog. 
+
 LICENSE:
 Copyright 2014-2017 QuadFlask
 
