@@ -101,6 +101,17 @@ public class NotesFragment extends Fragment {
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.sort_array, android.R.layout.simple_spinner_dropdown_item);
         sortBySpinner.setAdapter(spinnerAdapter);
+        sortBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("onItemSelected", ""+position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         listView = root.findViewById(R.id.notes);
 
         // Firebase Authentication
