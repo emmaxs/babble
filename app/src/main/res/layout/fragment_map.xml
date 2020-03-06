@@ -19,14 +19,91 @@
     <lecho.lib.hellocharts.view.ColumnChartView
         android:id="@+id/chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="70dp"
+        android:layout_height="425dp"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/chartTitle"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/chart"
+        android:id="@+id/labelBar"
+        android:weightSum="8">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableTop="@drawable/joy"
+            android:layout_weight="1"
+            android:textSize="5pt"
+            android:text="Joy"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableTop="@drawable/sadness"
+            android:layout_weight="1"
+            android:textSize="5pt"
+            android:text="Sadness"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableTop="@drawable/fear"
+            android:layout_weight="1"
+            android:textSize="5pt"
+            android:text="Fear"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableTop="@drawable/anger"
+            android:layout_weight="1"
+            android:textSize="5pt"
+            android:text="Anger"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableTop="@drawable/confident"
+            android:layout_weight="1"
+            android:textSize="5pt"
+            android:text="Confident"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableTop="@drawable/tentative"
+            android:layout_weight="1"
+            android:textSize="5pt"
+            android:text="Tentative"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableTop="@drawable/analytical"
+            android:layout_weight="1"
+            android:textSize="5pt"
+            android:text="Analytical"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableTop="@drawable/unknown"
+            android:layout_weight="1"
+            android:textSize="5pt"
+            android:text="Unknown"/>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/open_map_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/labelBar"
         android:text="@string/map_button"
         android:layout_alignParentBottom="true" />
 

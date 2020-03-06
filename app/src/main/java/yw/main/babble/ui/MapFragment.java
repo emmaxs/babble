@@ -115,8 +115,6 @@ public class MapFragment extends Fragment {
                                             emotionCount[7]++;
                                     }
                                 }
-                                Log.d("exs", "Numbers: " + emotionCount[0] + " " + emotionCount[1] + " "
-                                       + emotionCount[2] + " " +  emotionCount[3]);
                                 // Run the toast on UI
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
@@ -142,28 +140,10 @@ public class MapFragment extends Fragment {
             values.add(new SubcolumnValue((float) emotionCount[i], ChartUtils.pickColor()));
             Column column = new Column(values);
 
-            // Set labels to the column
-            AxisValue axisValue = new AxisValue(i);
-            axisValue.setLabel(labelArray[i]);
-
-//            column.setHasLabels(true);
             column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
         data = new ColumnChartData(columns);
-        data.setValueLabelsTextColor(Color.WHITE);
-
-        Axis axisX = new Axis();
-        Axis axisY = new Axis().setHasLines(true);
-        axisX.setName("Emotions");
-        axisY.setName("Count");
-        axisY.setTextColor(Color.WHITE);
-        axisX.setTextColor(Color.WHITE);
-        data.setAxisXBottom(axisX);
-        data.setAxisYLeft(axisY);
-
-        data.setAxisXBottom(null);
-        data.setAxisYLeft(null);
 
         chart.setColumnChartData(data);
         chart.setZoomEnabled(false);
