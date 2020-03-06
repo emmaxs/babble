@@ -13,7 +13,7 @@ public class ThemeChangeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // setting theme
-        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        String theme = ThemeChangeFragment.whichTheme(this);
         switch(theme){
             case "HeartsTheme":
                 setTheme(R.style.HeartsTheme);
@@ -37,7 +37,7 @@ public class ThemeChangeActivity extends AppCompatActivity {
         super.onResume();
 
         // setting theme
-        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        String theme = ThemeChangeFragment.whichTheme(this);
         switch(theme){
             case "HeartsTheme":
                 setTheme(R.style.HeartsTheme);

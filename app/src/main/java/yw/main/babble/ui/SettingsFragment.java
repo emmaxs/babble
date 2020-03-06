@@ -272,7 +272,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return true;
             }
         });
-
     }
 
     // method to open the login activity

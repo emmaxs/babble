@@ -2,6 +2,7 @@ package yw.main.babble;
 
 import android.Manifest;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
@@ -40,13 +41,17 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
 
+    public static Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         testGlyphSizing();
+
+        context = (Context) MainActivity.this;
+
         // setting theme
-        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
-        Log.d("theme", theme);
+        String theme = ThemeChangeFragment.whichTheme(this);
         switch(theme){
             case "HeartsTheme":
                 setTheme(R.style.HeartsTheme);
@@ -98,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         // setting theme
-        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        String theme = ThemeChangeFragment.whichTheme(this);
         Log.d("theme", theme);
         switch(theme){
             case "HeartsTheme":

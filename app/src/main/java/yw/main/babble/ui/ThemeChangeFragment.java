@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import yw.main.babble.MainActivity;
 import yw.main.babble.R;
 import yw.main.babble.font.FontDrawActivity;
 
@@ -34,7 +35,7 @@ public class ThemeChangeFragment extends PreferenceFragmentCompat{
 
     public void onCreatePreferences(Bundle bundle, String string){
         addPreferencesFromResource(R.xml.theme_prefs);
-        sharedPreferences = getActivity().getApplicationContext().getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE);
+        sharedPreferences = getActivity().getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE);
 
         Preference pref_paper = findPreference("paper");
         pref_paper.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -43,7 +44,9 @@ public class ThemeChangeFragment extends PreferenceFragmentCompat{
                 String theme = "JournalTheme";
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(THEME, theme);
-                //getActivity().recreate();
+
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
                 return true;
             }
         });
@@ -55,7 +58,11 @@ public class ThemeChangeFragment extends PreferenceFragmentCompat{
                 String theme = "DefaultTheme";
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(THEME, theme);
-                //getActivity().recreate();
+
+                setPrefs(MainActivity.context, theme);
+
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
                 return true;
             }
         });
@@ -67,7 +74,11 @@ public class ThemeChangeFragment extends PreferenceFragmentCompat{
                 String theme = "HeartsTheme";
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(THEME, theme);
-                //getActivity().recreate();
+
+                setPrefs(MainActivity.context, theme);
+
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
                 return true;
             }
         });
@@ -79,17 +90,33 @@ public class ThemeChangeFragment extends PreferenceFragmentCompat{
                 String theme = "NauticalTheme";
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(THEME, theme);
-                //getActivity().recreate();
+
+                setPrefs(MainActivity.context, theme);
+
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
                 return true;
             }
         });
     }
 
+
+    public static void setPrefs(Context context, String string){
+        SharedPreferences prefs = context.getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(THEME, string);
+    }
+
     // context should be app context
     public static String whichTheme(Context context){
-        SharedPreferences sharedPreferences = context.getSharedPreferences(THEME_PREFS, 0);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = context.getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE);
+
         // return null string if no theme is chosen
-        return sharedPreferences.getString(THEME, "");
+        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String string = sharedPreferences.getString(THEME, "JournalTheme");
+        return string;
+        //return sharedPreferences.getString(THEME, "JournalTheme");
     }
 
 }

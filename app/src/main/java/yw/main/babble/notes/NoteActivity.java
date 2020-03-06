@@ -94,7 +94,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
 
         checkPermissions();
         // setting theme
-        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        String theme = ThemeChangeFragment.whichTheme(this);
         switch(theme){
             case "HeartsTheme":
                 setTheme(R.style.HeartsTheme);
@@ -235,7 +235,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         //TODO: change theme (use sharedprefs)
         // setting theme
         // setting theme
-        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        String theme = ThemeChangeFragment.whichTheme(this);
         switch(theme){
             case "HeartsTheme":
                 setTheme(R.style.HeartsTheme);
