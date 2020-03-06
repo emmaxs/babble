@@ -5,6 +5,9 @@ Babble is your digital journaling companion. Save your journal entries in the cl
 ### Original Pitch
 Here is the pitch we presented in [class](https://docs.google.com/presentation/d/1AgNdRpJ33MOCTNdOaCXMMCWwGBiSXf-ggASJ9gaZj_Q/edit?usp=sharing).
 
+### Demo or Die: Final Pitch
+Here's the pitch we presented in class on [March 6, 2020](https://docs.google.com/presentation/d/1KNhhtfinkXZs0kHhxRn7AAWGg2KqCzHrmrTAG50dbcQ/edit?usp=sharing). 
+
 ### Team Effort Breakdown
 * Emma Sampugnaro - Firebase Database and Storage, Watson ML Sentiment Analysis, Emotion/Location Displays (Map and Chart)
 * Addison Wessel - Handwriting to Font, Drawable Interface, UI
@@ -20,7 +23,8 @@ Available for download on Google Drive [here](https://drive.google.com/file/d/1n
 Coming soon.
 
 ### Source Code
-Download on google drive [here](https://drive.google.com/file/d/13FhjJyxc0MqBfgtq8lPDyxM-9mCsFHSb/view?usp=sharing)
+Download on google drive [here](https://drive.google.com/file/d/13FhjJyxc0MqBfgtq8lPDyxM-9mCsFHSb/view?usp=sharing).
+Take me to the [babble GitHub repository](https://github.com/emmaxs/babble).
 
 ### Acknowlegements
 Used emojis from this [website](https://icons8.com/icon/pack/emoji/emoji).
