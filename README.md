@@ -1,6 +1,16 @@
 ## Welcome to Babble
 
-Babble is your digital journaling companion. Save your journal entries in the cloud, store thoughts in your own handwriting, get inspired by the emotions around you. The possibilites are endless.
+Babble is your digital journaling companion. Save your journal entries in the cloud, store thoughts in your own handwriting, get inspired by the emotions around you. The possibilites are endless, but the interface is simple.
+
+### Features
+- Write beautiful, sortable, journal entries. Fast.
+- Tap to add, swipe to delete entries.
+- Create a font in your handwriting (supports multi-color)
+- Upload entries to cloud. Our app can't get wet like a notebook.
+- Let Watson’s ML interpret the tone of your journal entries
+- Sort your entries easily by emotion, date, or title and more
+- Investigate the emotional patterns in your life and all around you. See emotions of other babble users as a chart, or walk through them - literally!
+
 
 ### Original Pitch
 Here is the pitch we presented in [class](https://docs.google.com/presentation/d/1AgNdRpJ33MOCTNdOaCXMMCWwGBiSXf-ggASJ9gaZj_Q/edit?usp=sharing).
