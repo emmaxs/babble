@@ -18,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -46,7 +48,7 @@ public class NotesFragment extends Fragment {
     ArrayList<NotesBuilder> notesList;
     private NotesAdapter nAdapter;
     private SwipeMenuListView listView;
-
+    private Spinner sortBySpinner;
     public static final String ID = "ID";
     public static final String CONTENT = "CONTENT";
     public static final String TITLE = "TITLE";
@@ -95,7 +97,10 @@ public class NotesFragment extends Fragment {
                 startActivityForResult(myIntent, NotesFragment.SAVE_ENTRY);
             }
         });
-
+        sortBySpinner = root.findViewById(R.id.sort_spinner);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.sort_array, android.R.layout.simple_spinner_dropdown_item);
+        sortBySpinner.setAdapter(spinnerAdapter);
         listView = root.findViewById(R.id.notes);
 
         // Firebase Authentication

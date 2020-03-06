@@ -42,4 +42,12 @@
 
     <string name="paper_theme">Paper Theme</string>
     <string name="hello_kitty">Hello Kitty</string>
+
+    <string-array name="sort_array">
+        <item>Time</item>
+        <item>Mood</item>
+        <item>Location</item>
+        <item>Length</item>
+        <item>ID</item>
+    </string-array>
 </resources>
