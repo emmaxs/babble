@@ -6,7 +6,7 @@ import com.google.firebase.firestore.ServerTimestamp;
 public class NotesBuilder {
 
     private String title, emotion,
-            content, id;
+            content, id, userID;
     private Double latitude;
     private Double longitude;
     @ServerTimestamp private Timestamp timestamp;
@@ -36,6 +36,14 @@ public class NotesBuilder {
         this.id = id;
     }
 
+    public String getUserId() {
+        return userID;
+    }
+
+    public void setUserId(String id) {
+        this.userID = id;
+    }
+
     public Timestamp getTimestamp() {
         return timestamp;
     }
@@ -44,13 +52,15 @@ public class NotesBuilder {
         this.timestamp = timestamp;
     }
 
-    public NotesBuilder(String title, String content, String emotion, Double latitude, Double longitude) {
+    public NotesBuilder(String title, String content, String emotion, Double latitude, Double longitude, String id, String userId) {
         this.title = title;
         this.content = content;
         this.emotion = emotion;
         // possibly make geopoint
         this.latitude =latitude;
         this.longitude = longitude;
+        this.id = id;
+        this.userID = userId;
     }
 
     public String getTitle() {

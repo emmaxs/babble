@@ -202,9 +202,9 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                             // Save to firebase
                             switch (mode) {
                                 case NEW_NOTE:
-                                    newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
+                                    newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude, null, userId);
                                     Log.d("title", title);
-                                    newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
+                                    newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude, null, userId);
                                         db.collection("users").document(userId)
                                                 .collection("notes").add(newNote);
                                     break;
