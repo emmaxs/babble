@@ -19,9 +19,6 @@ Here is a link to the MVC and Threading Diagram we presented during [Show and Te
 ### APK
 Available for download on Google Drive [here](https://drive.google.com/file/d/1nQiBOGnt2ZwSgjbC2sj7FMTOLIHASvgP/view?usp=sharing)
 
-### Demo Day Presentation
-Coming soon.
-
 ### Source Code
 Download on google drive [here](https://drive.google.com/file/d/13FhjJyxc0MqBfgtq8lPDyxM-9mCsFHSb/view?usp=sharing).
 Take me to the [babble GitHub repository](https://github.com/emmaxs/babble).
