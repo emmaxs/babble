@@ -14,13 +14,13 @@ Here is the pitch we presented in [class](https://docs.google.com/presentation/d
 Here is a link to the MVC and Threading Diagram we presented during [Show and Tell 1 & 2](https://docs.google.com/presentation/d/1ejdROAu_Ms1Mu4eX_bIxM7x1S3fD2zbaiAfkCbGuQMg/edit?usp=sharing).
 
 ### APK
-APK Release Date: March 6th, 2020. 
+Available for download on Google Drive [here](https://drive.google.com/file/d/1nQiBOGnt2ZwSgjbC2sj7FMTOLIHASvgP/view?usp=sharing)
 
 ### Demo Day Presentation
 Coming soon.
 
 ### Source Code
-Coming soon. Note: Github repository is currently set to private.
+Download on google drive [here](https://drive.google.com/file/d/13FhjJyxc0MqBfgtq8lPDyxM-9mCsFHSb/view?usp=sharing)
 
 ### Acknowlegements
 Used emojis from this [website](https://icons8.com/icon/pack/emoji/emoji).
