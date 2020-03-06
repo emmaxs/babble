@@ -31,7 +31,6 @@ public class FontDrawActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.HeartsTheme);
         setContentView(R.layout.activity_font_draw);
 
         builderAndSaver = new BitmapBuilderAndSaver();
