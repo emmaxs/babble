@@ -12,13 +12,23 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,22 +38,7 @@ import com.ibm.watson.tone_analyzer.v3.model.ToneAnalysis;
 import com.ibm.watson.tone_analyzer.v3.model.ToneOptions;
 import com.ibm.watson.tone_analyzer.v3.model.ToneScore;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,9 +77,6 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
     ToneOptions options;
     String toastMessage;
 
-    // Firebase
-    private FirebaseAuth firebaseAuth;
-    private FirebaseUser firebaseUser;
     private FirebaseFirestore db;
     private String userId;
 
@@ -93,7 +85,6 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
 
     // for app-wide shared prefs
     public static final String myPrefs = "MyPrefs";
-    public static final String myMap = "Map";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,8 +146,9 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
 
             }
         });
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
+        // Firebase
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
         if (firebaseUser != null)
             userId = firebaseUser.getUid();
@@ -174,7 +166,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                     title = titleEditText.getText().toString();
                 }
 
-                if (!editText.getText().toString().isEmpty())  {
+                if (!editText.getText().toString().isEmpty()) {
 
                     // Only do save if you have content
                     content = editText.getText().toString();
@@ -189,7 +181,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                                     .getTones();
                             double max = 0;
                             // Take the emotion with the highest score
-                            for(ToneScore score:scores) {
+                            for (ToneScore score : scores) {
                                 if (score.getScore() > max) {
                                     max = score.getScore();
                                     detectedTone = score.getToneName().toUpperCase();
@@ -205,46 +197,29 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                                     newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude, null, userId);
                                     Log.d("title", title);
                                     newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude, null, userId);
-                                        db.collection("users").document(userId)
-                                                .collection("notes").add(newNote);
+                                    db.collection("users").document(userId)
+                                            .collection("notes").add(newNote);
                                     break;
                                 case UPDATE_NOTE:
-
-                                        DocumentReference notesRef = db.collection("users").document(userId)
-                                                .collection("notes").document(docId);
-                                        Map<String,Object> updates = new HashMap<>();
-                                        updates.put("id", docId);
-                                        updates.put("content", content);
-                                        updates.put("title", titleEditText.getText().toString());
-                                        updates.put("latitude", currentLatitude);
-                                        updates.put("longitude", currentLongitude);
-                                        updates.put("emotion", detectedTone);
-                                        updates.put("timestamp", FieldValue.serverTimestamp());
-                                        notesRef.update(updates)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Log.d("EXS", "DocumentSnapshot successfully updated!");
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.w("EXS", "Error updating document", e);
-                                                    }
-                                                });
-
+                                    DocumentReference notesRef = db.collection("users").document(userId)
+                                            .collection("notes").document(docId);
+                                    Map<String, Object> updates = new HashMap<>();
+                                    updates.put("id", docId);
+                                    updates.put("content", content);
+                                    updates.put("title", titleEditText.getText().toString());
+                                    updates.put("latitude", currentLatitude);
+                                    updates.put("longitude", currentLongitude);
+                                    updates.put("emotion", detectedTone);
+                                    updates.put("timestamp", FieldValue.serverTimestamp());
+                                    notesRef.update(updates)
+                                            .addOnSuccessListener(aVoid -> Log.d("EXS", "DocumentSnapshot successfully updated!"))
+                                            .addOnFailureListener(e -> Log.w("EXS", "Error updating document", e));
                                     break;
                             }
 
                             // Run the toast on UI
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getBaseContext(),
-                                            toastMessage, Toast.LENGTH_LONG).show();
-                                }
-                            });
+                            runOnUiThread(() -> Toast.makeText(getBaseContext(),
+                                    toastMessage, Toast.LENGTH_LONG).show());
                         }
                     });
                 }
@@ -258,6 +233,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
         toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
         toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
+
     }
 
     public void onResume(){
@@ -292,12 +268,15 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             String provider = locationManager.getBestProvider(criteria, true);
             // Log.d provider will print GPS
+            assert provider != null;
             locationManager.requestLocationUpdates(provider, 0, 0, this);
             Location location = locationManager.getLastKnownLocation(provider);
             // One situation to use callback manually
             onLocationChanged(location);
         }
-        catch (SecurityException e) {}
+        catch (SecurityException e) {
+            Log.wtf("Security Exception", Arrays.toString(e.getStackTrace()));
+        }
     }
 
     public void onLocationChanged(Location location) {
@@ -319,7 +298,6 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
     public void onStatusChanged(String provider, int status, Bundle bundle) {}
 
     public void checkPermissions(){
-        if(Build.VERSION.SDK_INT < 23) return;
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,
@@ -328,7 +306,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
             initLocationManager();
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == PERMISSIONS_REQUEST){
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 initLocationManager();

@@ -62,7 +62,7 @@ public class Glyphs {
     }
 
     /**
-     * Builds map from characters to default_font bitmaps
+     * Builds map from characters to font bitmaps
      */
     private void buildMap() {
         for(int i = 0; i < 26; i++) {
@@ -80,7 +80,7 @@ public class Glyphs {
     }
 
     /**
-     * Draws a string on a canvas using the default_font we have stored
+     * Draws a string on a canvas using the font we have stored
      * @param canvas Canvas on which to draw
      * @param text Text you want to draw
      * @param x X position of upper left corner of text

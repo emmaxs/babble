@@ -84,12 +84,17 @@ public class FontDrawActivity extends Activity {
         saveFont();
     }
 
+    /**
+     * Updates the hint shown at top of screen to let user know which letter to write
+     */
     private void updateHint() {
         letterHint.setText("Write " + Glyphs.ALL_GLYPHS[currCharIndex] + ". Remember to use whole screen!");
     }
 
 
-
+    /**
+     * Advances to next letter
+     */
     private void nextLetter() {
         saveGlyph();
         currCharIndex++;
@@ -101,10 +106,16 @@ public class FontDrawActivity extends Activity {
         dv.setImage(builderAndSaver.getGlyph(Glyphs.ALL_GLYPHS[currCharIndex]));
     }
 
+    /**
+     * Saves letter we are currently on
+     */
     private void saveGlyph() {
         builderAndSaver.putGlyph(dv.getScaledBitmap(), Glyphs.ALL_GLYPHS[currCharIndex]);
     }
 
+    /**
+     * Goes back a letter and displays it
+     */
     private void prevLetter() {
         saveGlyph();
         currCharIndex--;
@@ -120,6 +131,9 @@ public class FontDrawActivity extends Activity {
     }
 
 
+    /**
+     * changes color of brush according to QuadFlask's color chooser library
+     */
     private void changeBrushColor() {
         ColorPickerDialogBuilder.with(this)
                 .setTitle("Choose Stroke Color")
@@ -145,6 +159,9 @@ public class FontDrawActivity extends Activity {
                 }).build().show();
     }
 
+    /**
+     * Changes size of brush according to user input
+     */
     private void changeBrushSize() {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);

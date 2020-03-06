@@ -9,13 +9,11 @@ import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CustomEditText extends AppCompatEditText {
     private static final double TEXT_SIZE = .3;
     private Glyphs glyphs;
     private BitmapBuilderAndSaver builderAndSaver;
+
     public CustomEditText(Context context) {
         super(context);
         init();
@@ -31,6 +29,10 @@ public class CustomEditText extends AppCompatEditText {
         init();
     }
 
+    /**
+     * Grabs bitmap from files, sets typeface to put cursor in
+     * proper place.
+     */
     private void init() {
         builderAndSaver = new BitmapBuilderAndSaver();
         builderAndSaver.loadBitmap(getContext());
@@ -42,24 +44,20 @@ public class CustomEditText extends AppCompatEditText {
     }
 
     @Override
-    protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
-        super.onTextChanged(text, start, lengthBefore, lengthAfter);
-//        Log.d("onTextChanged()", text.toString());
-    }
-    @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
         canvas.drawColor(Color.WHITE);
         int glyphPacking = (int) (getWidth() / (Glyphs.CHAR_BITMAP_WIDTH*TEXT_SIZE))-1;
-
-
-        Log.d("draw()", String.valueOf(getSelectionStart()));
-        int[] location = new int[2];
-        Log.d("location y", "" + location[1]);
-        glyphs.drawString(canvas, packWordsOneWay(getText().toString(), glyphPacking), getSelectionStart(),location[0] + 10, location[1] + 30, TEXT_SIZE);
+        glyphs.drawString(canvas, textWrap(getText().toString(), glyphPacking), getSelectionStart(),10, 30, TEXT_SIZE);
     }
 
-    private String packWordsOneWay(String text, int glyphPacking) {
+    /**
+     * Line wrapping method
+     * @param text text to wrap
+     * @param glyphPacking width of line to wrap to
+     * @return text wrapped to fit glyphPacking
+     */
+    private String textWrap(String text, int glyphPacking) {
         int counter = 0;
         for(int i = 0; i < text.length(); i++) {
             if(text.charAt(i) == '\n')
@@ -78,22 +76,5 @@ public class CustomEditText extends AppCompatEditText {
             counter++;
         }
         return text;
-    }
-
-    private String packWordsRecursive(String text, int glyphPacking) {
-        if(text.length() <= glyphPacking) {
-            return text;
-        } else if(text.substring(0, glyphPacking).contains("\n")) {
-            return text.substring(0, text.indexOf('\n')) +
-                    packWordsRecursive(text.substring(text.indexOf('\n')+1), glyphPacking);
-        } else {
-            if(text.substring(0, glyphPacking).contains(" ")) {
-                return text.substring(0, text.substring(0, glyphPacking).lastIndexOf(' ')) + "\n" +
-                        packWordsRecursive(text.substring(text.substring(0, glyphPacking).lastIndexOf(' ')+1), glyphPacking);
-            } else {
-                return text.substring(0, glyphPacking) + "\n" +
-                        packWordsRecursive(text.substring(glyphPacking), glyphPacking);
-            }
-        }
     }
 }
