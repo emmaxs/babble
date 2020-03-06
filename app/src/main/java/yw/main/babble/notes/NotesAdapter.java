@@ -48,7 +48,7 @@ public class NotesAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             viewHolder.title = convertView.findViewById(R.id.title);
             viewHolder.content = convertView.findViewById(R.id.content);
-            viewHolder.icon = convertView.findViewById(R.id.imgIcon);
+            viewHolder.icon = convertView.findViewById(R.id.emoteIcon);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
