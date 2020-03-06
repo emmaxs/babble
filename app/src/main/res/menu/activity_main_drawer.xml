@@ -6,24 +6,25 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_notes"
-            android:icon="@drawable/ic_shortcut_create"
+            android:icon="@drawable/note"
             android:title="@string/menu_notes" />
     </group>
-    
-    <item android:title="Explore">
+
+    <item android:title="@string/explore_title">
         <menu>
             <item
                 android:id="@+id/nav_map"
-                android:icon="@drawable/ic_menu_share"
+                android:icon="@drawable/emotion"
                 android:title="@string/menu_map" />
-            </menu>
+        </menu>
     </item>
+
             
-    <item android:title="User Settings">
+    <item android:title="@string/settings_title">
         <menu>
             <item
                 android:id="@+id/nav_settings"
-                android:icon="@drawable/ic_menu_share"
+                android:icon="@drawable/settings"
                 android:title="@string/menu_settings" />
         </menu>
     </item>

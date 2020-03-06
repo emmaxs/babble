@@ -18,14 +18,15 @@
     <string name="nav_header_subtitle">a simple journaling app.</string>
     <string name="nav_header_desc">Navigation header</string>
 
-    <string name="menu_notes">Notes</string>
-    <string name="menu_map">Map</string>
+    <string name="menu_notes">My Notes</string>
+    <string name="menu_map">Emotion Map</string>
+    <string name="explore_title">Explore</string>
+    <string name="settings_title">User Settings</string>
     <string name="menu_settings">Settings</string>
 
     <string name="font_draw_button">Open Font Draw</string>
     <string name="map_button">See the Emotions Around You</string>
-    <string name="plane_finding">Searching for surfaces&#8230;</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps">Emotions Near Me</string>
 
     <string name="profile_picture">Change Picture</string>
 
@@ -54,5 +55,5 @@
         <item>ID</item>
     </string-array>
 
-    <string name="chartTitle">Emotions of Other Babble Users</string>
+    <string name="chartTitle">Snapshot of Babble Users\' Emotions</string>
 </resources>
