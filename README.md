@@ -16,7 +16,7 @@ Responsibilty to be determined: Location services and AR to see snippets of the 
 Here is a link to the MVC and Threading Diagram we presented during [Show and Tell 1 & 2](https://docs.google.com/presentation/d/1ejdROAu_Ms1Mu4eX_bIxM7x1S3fD2zbaiAfkCbGuQMg/edit?usp=sharing).
 
 ### APK
-APK Release Date: March 6th, 2019. 
+APK Release Date: March 6th, 2020. 
 
 ### Demo Day Presentation
 Coming soon.
