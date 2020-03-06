@@ -81,16 +81,12 @@ public class FontDrawActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        saveGlyph();
         saveFont();
     }
 
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-    }
-
     private void updateHint() {
-        letterHint.setText("Please write character " + Glyphs.ALL_GLYPHS[currCharIndex]);
+        letterHint.setText("Write " + Glyphs.ALL_GLYPHS[currCharIndex] + ". Remember to use whole screen!");
     }
 
 

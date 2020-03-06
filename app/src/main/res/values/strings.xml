@@ -47,7 +47,7 @@
         <item>Time</item>
         <item>Mood</item>
         <item>Location</item>
-        <item>Length</item>
+        <item>Alphabetical</item>
         <item>ID</item>
     </string-array>
 </resources>
