@@ -41,12 +41,15 @@
     <string name="themes_summary">Paper, light, dark, etc</string>
 
     <string name="paper_theme">Paper Theme</string>
-    <string name="hello_kitty">Hello Kitty</string>
+    <string name="default_theme">Default Theme</string>
+    <string name="nautical">Nautical Theme</string>
+    <string name="hearts">Hearts Theme</string>
 
     <string-array name="sort_array">
         <item>Time</item>
         <item>Mood</item>
         <item>Location</item>
+        <item>Length</item>
         <item>Alphabetical</item>
         <item>ID</item>
     </string-array>

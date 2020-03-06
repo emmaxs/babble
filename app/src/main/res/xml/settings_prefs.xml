@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.SettingsFragment">
+    tools:context=".ui.SettingsFragment"
+    android:iconSpaceReserved="false">
 
     <PreferenceCategory android:title="@string/account_prefs">
         <Preference
+            android:iconSpaceReserved="false"
             android:key="pref1"
             android:title="@string/password_change">
         </Preference>
 
         <Preference
+            android:iconSpaceReserved="false"
             android:key="deleteAccount"
             android:title="@string/delete_account">
         </Preference>
 
         <Preference
+            android:iconSpaceReserved="false"
             android:key="logOut"
             android:title="@string/log_out">
         </Preference>
@@ -26,11 +30,13 @@
 
     <PreferenceCategory android:title="@string/visual_settings">
         <Preference
+            android:iconSpaceReserved="false"
             android:key="openFontDraw"
             android:title="@string/font_draw">
         </Preference>
 
         <Preference
+            android:iconSpaceReserved="false"
             android:key="changeTheme"
             android:title="@string/themes"
             android:summary="@string/themes_summary">
