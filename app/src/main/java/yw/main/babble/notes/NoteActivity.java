@@ -11,8 +11,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -156,6 +154,9 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
             public void onClick(View v) {
 
                 // Get string from Edit Text
+                if (title != null) {
+                    title = titleEditText.getText().toString();
+                }
                 content = editText.getText().toString();
                 // Build the tone options
                 options = new ToneOptions.Builder().text(content).build();
@@ -181,15 +182,14 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                         // Save to firebase
                         switch (mode) {
                             case NEW_NOTE:
+                                newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
                                 Log.d("title", title);
-                                newNote = new NotesBuilder(titleEditText.getText().toString(), content, detectedTone, currentLatitude, currentLongitude);
-                                if (wifiConnection()) {
+                                newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
                                     db.collection("users").document(userId)
                                             .collection("notes").add(newNote);
-                                }
                                 break;
                             case UPDATE_NOTE:
-                                if (wifiConnection()) {
+
                                     DocumentReference notesRef = db.collection("users").document(userId)
                                             .collection("notes").document(docId);
                                     Map<String,Object> updates = new HashMap<>();
@@ -213,7 +213,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                                                     Log.w("EXS", "Error updating document", e);
                                                 }
                                             });
-                                }
+
                                 break;
                         }
 
@@ -244,20 +244,6 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         //TODO: change theme (use sharedprefs)
     }
 
-    // check wifi connection
-    private boolean wifiConnection() {
-        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        if (wifiMgr.isWifiEnabled()) { // Wi-Fi is on
-            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-            if( wifiInfo.getNetworkId() == -1 ){
-                return false; // not connected to access point
-            }
-        return true; // connected to access point
-        }
-        else {
-            return false; // Wi-Fi is off
-        }
-    }
 
     private void initLocationManager(){
         try {
