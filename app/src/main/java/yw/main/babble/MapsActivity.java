@@ -68,8 +68,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // TODO: Add floating action bar to create a new note
-
         // If you have already been restarted
         if (savedInstanceState != null) {
             isMapZoomed = savedInstanceState.getBoolean(ZOOM_STATUS);
@@ -119,7 +117,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        // TODO: Get rid of with read once
                                         // clear the old list
                                         if (emotionMarkers != null) {
                                             for (Marker marker: emotionMarkers) {
