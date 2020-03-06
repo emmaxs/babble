@@ -37,6 +37,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -57,6 +59,7 @@ import static yw.main.babble.ui.NotesFragment.WRITE_MODE;
 
 public class NoteActivity extends AppCompatActivity implements LocationListener {
     EditText editText;
+    EditText titleEditText;
     Intent intent;
     NotesBuilder newNote;
 
@@ -105,6 +108,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
         sharedPreferences = getApplicationContext().getSharedPreferences(myPrefs, Context.MODE_PRIVATE);
 
         editText = findViewById(R.id.EditText);
+        titleEditText = findViewById(R.id.note_activity_title_editText);
         intent = getIntent();
 
         // Set up the note if you are just updating
@@ -116,8 +120,25 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
             title = intent.getStringExtra(TITLE);
             // Set the content of the edit text
             editText.setText(intent.getStringExtra(CONTENT));
+            titleEditText.setText(title);
         }
+        titleEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                title = s.toString();
+                Log.d("title updated to", title);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
 
@@ -133,6 +154,9 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
             public void onClick(View v) {
 
                 // Get string from Edit Text
+                if (title != null) {
+                    title = titleEditText.getText().toString();
+                }
                 content = editText.getText().toString();
                 // Build the tone options
                 options = new ToneOptions.Builder().text(content).build();
@@ -159,7 +183,8 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                         switch (mode) {
                             case NEW_NOTE:
                                 newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
-
+                                Log.d("title", title);
+                                newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
                                     db.collection("users").document(userId)
                                             .collection("notes").add(newNote);
                                 break;
@@ -170,7 +195,7 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                                     Map<String,Object> updates = new HashMap<>();
                                     updates.put("id", docId);
                                     updates.put("content", content);
-                                    updates.put("title", title);
+                                    updates.put("title", titleEditText.getText().toString());
                                     updates.put("latitude", currentLatitude);
                                     updates.put("longitude", currentLongitude);
                                     updates.put("emotion", detectedTone);

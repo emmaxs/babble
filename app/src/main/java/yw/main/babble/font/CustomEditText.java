@@ -54,7 +54,10 @@ public class CustomEditText extends AppCompatEditText {
 
 
         Log.d("draw()", String.valueOf(getSelectionStart()));
-        glyphs.drawString(canvas, packWordsOneWay(getText().toString(), glyphPacking), getSelectionStart(),10, 30, TEXT_SIZE);
+        int[] location = new int[2];
+//        getLocationOnScreen(location);
+        Log.d("location y", "" + location[1]);
+        glyphs.drawString(canvas, packWordsOneWay(getText().toString(), glyphPacking), getSelectionStart(),location[0] + 10, location[1] + 30, TEXT_SIZE);
     }
 
     private String packWordsOneWay(String text, int glyphPacking) {

@@ -6,13 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".ui.NotesFragment"
     android:theme="@style/HeartsTheme">
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sort_options_layout"
+        android:layout_alignParentTop="true"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort By:"
+            android:id="@+id/sort_by_text"
+            android:layout_toLeftOf="@id/sort_spinner"
+            android:layout_centerVertical="true"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:id="@+id/sort_spinner"/>
+    </RelativeLayout>
     <com.baoyz.swipemenulistview.SwipeMenuListView
         android:id="@+id/notes"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_margin="8dp"
-        android:layout_alignParentTop="true"/>
+        android:layout_below="@id/sort_options_layout"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
