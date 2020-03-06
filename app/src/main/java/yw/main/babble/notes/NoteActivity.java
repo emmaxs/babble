@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -156,78 +157,83 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
-        fab.setOnClickListener(v -> {
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-            // Get string from Edit Text
-            if (title != null) {
-                title = titleEditText.getText().toString();
-            }
+                // Get string from Edit Text
+                if (title != null) {
+                    title = titleEditText.getText().toString();
+                }
 
-            if (!editText.getText().toString().isEmpty())  {
+                if (!editText.getText().toString().isEmpty()) {
 
-                // Only do save if you have content
-                content = editText.getText().toString();
-                // Build the tone options
-                options = new ToneOptions.Builder().text(content).build();
-                // Query the service
-                AsyncTask.execute(() -> {
-                    ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
-                    List<ToneScore> scores = toneAnalysis.getDocumentTone()
-                            .getTones();
-                    double max = 0;
-                    // Take the emotion with the highest score
-                    for(ToneScore score:scores) {
-                        if (score.getScore() > max) {
-                            max = score.getScore();
-                            detectedTone = score.getToneName().toUpperCase();
+                    // Only do save if you have content
+                    content = editText.getText().toString();
+                    // Build the tone options
+                    options = new ToneOptions.Builder().text(content).build();
+                    // Query the service
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
+                            List<ToneScore> scores = toneAnalysis.getDocumentTone()
+                                    .getTones();
+                            double max = 0;
+                            // Take the emotion with the highest score
+                            for (ToneScore score : scores) {
+                                if (score.getScore() > max) {
+                                    max = score.getScore();
+                                    detectedTone = score.getToneName().toUpperCase();
+                                }
+                            }
+                            toastMessage =
+                                    "The following emotions were detected:\n\n"
+                                            + detectedTone.toUpperCase();
+
+                            // Save to firebase
+                            switch (mode) {
+                                case NEW_NOTE:
+                                    newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude, null, userId);
+                                    Log.d("title", title);
+                                    newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude, null, userId);
+                                    db.collection("users").document(userId)
+                                            .collection("notes").add(newNote);
+                                    break;
+                                case UPDATE_NOTE:
+                                    DocumentReference notesRef = db.collection("users").document(userId)
+                                            .collection("notes").document(docId);
+                                    Map<String, Object> updates = new HashMap<>();
+                                    updates.put("id", docId);
+                                    updates.put("content", content);
+                                    updates.put("title", titleEditText.getText().toString());
+                                    updates.put("latitude", currentLatitude);
+                                    updates.put("longitude", currentLongitude);
+                                    updates.put("emotion", detectedTone);
+                                    updates.put("timestamp", FieldValue.serverTimestamp());
+                                    notesRef.update(updates)
+                                            .addOnSuccessListener(aVoid -> Log.d("EXS", "DocumentSnapshot successfully updated!"))
+                                            .addOnFailureListener(e -> Log.w("EXS", "Error updating document", e));
+                                    break;
+                            }
+
+                            // Run the toast on UI
+                            runOnUiThread(() -> Toast.makeText(getBaseContext(),
+                                    toastMessage, Toast.LENGTH_LONG).show());
                         }
-                    }
-                    toastMessage =
-                            "The following emotions were detected:\n\n"
-                                    + detectedTone.toUpperCase();
-
-                    // Save to firebase
-                    switch (mode) {
-                        case NEW_NOTE:
-                            newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
-                            Log.d("title", title);
-                            newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
-                                db.collection("users").document(userId)
-                                        .collection("notes").add(newNote);
-                            break;
-                        case UPDATE_NOTE:
-
-                                DocumentReference notesRef = db.collection("users").document(userId)
-                                        .collection("notes").document(docId);
-                                Map<String,Object> updates = new HashMap<>();
-                                updates.put("id", docId);
-                                updates.put("content", content);
-                                updates.put("title", titleEditText.getText().toString());
-                                updates.put("latitude", currentLatitude);
-                                updates.put("longitude", currentLongitude);
-                                updates.put("emotion", detectedTone);
-                                updates.put("timestamp", FieldValue.serverTimestamp());
-                                notesRef.update(updates)
-                                        .addOnSuccessListener(aVoid -> Log.d("EXS", "DocumentSnapshot successfully updated!"))
-                                        .addOnFailureListener(e -> Log.w("EXS", "Error updating document", e));
-
-                            break;
-                    }
-
-                    // Run the toast on UI
-                    runOnUiThread(() -> Toast.makeText(getBaseContext(),
-                            toastMessage, Toast.LENGTH_LONG).show());
-                });
+                    });
+                }
+                setResult(Activity.RESULT_OK, intent);
+                // close the activity
+                finish();
             }
-            setResult(Activity.RESULT_OK, intent);
-            // close the activity
-            finish();
         });
 
         // Sentiment analysis
         authenticator = new IamAuthenticator(getString(R.string.tone_api_key));
         toneAnalyzer =  new ToneAnalyzer("2017-09-21", authenticator);
         toneAnalyzer.setServiceUrl(getString(R.string.tone_url));
+
     }
 
     public void onResume(){

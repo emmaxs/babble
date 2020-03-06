@@ -55,5 +55,10 @@
         <item>ID</item>
     </string-array>
 
-    <string name="chartTitle">Snapshot of Babble Users\' Emotions</string>
+    <string-array name="chart_array">
+        <item>Your Emotions</item>
+        <item>All Emotions</item>
+    </string-array>
+
+    <string name="chartTitle">Emotions Recorded with Babble</string>
 </resources>

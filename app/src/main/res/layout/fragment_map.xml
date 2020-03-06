@@ -7,6 +7,26 @@
     tools:context=".ui.MapFragment"
     android:layout_weight="1">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sort_options_layout"
+        android:layout_alignParentTop="true"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose View:"
+            android:id="@+id/sort_by_chart"
+            android:layout_toLeftOf="@id/chart_spinner"
+            android:layout_centerVertical="true"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:id="@+id/chart_spinner"/>
+    </RelativeLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
