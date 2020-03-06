@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -27,6 +28,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import yw.main.babble.font.BitmapBuilderAndSaver;
+import yw.main.babble.font.Glyphs;
 import yw.main.babble.ui.ThemeChangeFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        testGlyphSizing();
         // setting theme
         String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
         Log.d("theme", theme);
@@ -78,6 +81,16 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             doTheRest();
+        }
+    }
+
+    private void testGlyphSizing() {
+        BitmapBuilderAndSaver bitmapBuilderAndSaver = new BitmapBuilderAndSaver();
+        bitmapBuilderAndSaver.loadBitmap(this);
+
+        Glyphs glyphs = new Glyphs(bitmapBuilderAndSaver.getBitmap());
+        for(Character c : Glyphs.CHAR_UPPER_LEFT.keySet()) {
+            Log.d(c.toString(), Glyphs.CHAR_UPPER_LEFT.get(c).toString());
         }
     }
 

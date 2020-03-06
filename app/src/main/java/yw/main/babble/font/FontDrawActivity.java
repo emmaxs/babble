@@ -102,7 +102,7 @@ public class FontDrawActivity extends Activity {
     }
 
     private void saveGlyph() {
-        builderAndSaver.putGlyph(dv.getBitmap(), Glyphs.ALL_GLYPHS[currCharIndex]);
+        builderAndSaver.putGlyph(dv.getScaledBitmap(), Glyphs.ALL_GLYPHS[currCharIndex]);
     }
 
     private void prevLetter() {

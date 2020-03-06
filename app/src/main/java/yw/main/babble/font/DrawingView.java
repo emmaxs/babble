@@ -124,7 +124,7 @@ public class DrawingView extends View {
     public void setStrokeSize(int size) {
         mPaint.setStrokeWidth(size);
     }
-    public Bitmap getBitmap() {
+    public Bitmap getScaledBitmap() {
         Bitmap drawing = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(drawing);
         this.draw(canvas);

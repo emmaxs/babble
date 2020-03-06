@@ -59,6 +59,7 @@ public class BitmapBuilderAndSaver {
     public boolean saveBitmap(Context context) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), FILE_NAME));
+            bitmap = scaleBitmap(bitmap);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
             fileOutputStream.close();
             return true;
@@ -81,9 +82,14 @@ public class BitmapBuilderAndSaver {
                 Drawable d = context.getResources().getDrawable(R.drawable.default_font);
                 if(d instanceof BitmapDrawable) {
                     bitmap = ((BitmapDrawable) d).getBitmap();
+                    bitmap = scaleBitmap(bitmap);
                 }
             }
         }
+    }
+
+    private Bitmap scaleBitmap(Bitmap bitmap) {
+        return Bitmap.createScaledBitmap(bitmap, Glyphs.getEntireBitmapWidth(), Glyphs.getEntireBitmapHeight(), false);
     }
 
     public void putGlyph(Bitmap character, char letter) {
