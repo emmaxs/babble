@@ -55,7 +55,6 @@ public class CustomEditText extends AppCompatEditText {
 
         Log.d("draw()", String.valueOf(getSelectionStart()));
         int[] location = new int[2];
-//        getLocationOnScreen(location);
         Log.d("location y", "" + location[1]);
         glyphs.drawString(canvas, packWordsOneWay(getText().toString(), glyphPacking), getSelectionStart(),location[0] + 10, location[1] + 30, TEXT_SIZE);
     }
@@ -79,5 +78,22 @@ public class CustomEditText extends AppCompatEditText {
             counter++;
         }
         return text;
+    }
+
+    private String packWordsRecursive(String text, int glyphPacking) {
+        if(text.length() <= glyphPacking) {
+            return text;
+        } else if(text.substring(0, glyphPacking).contains("\n")) {
+            return text.substring(0, text.indexOf('\n')) +
+                    packWordsRecursive(text.substring(text.indexOf('\n')+1), glyphPacking);
+        } else {
+            if(text.substring(0, glyphPacking).contains(" ")) {
+                return text.substring(0, text.substring(0, glyphPacking).lastIndexOf(' ')) + "\n" +
+                        packWordsRecursive(text.substring(text.substring(0, glyphPacking).lastIndexOf(' ')+1), glyphPacking);
+            } else {
+                return text.substring(0, glyphPacking) + "\n" +
+                        packWordsRecursive(text.substring(glyphPacking), glyphPacking);
+            }
+        }
     }
 }

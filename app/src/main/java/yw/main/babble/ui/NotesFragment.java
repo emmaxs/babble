@@ -63,7 +63,7 @@ public class NotesFragment extends Fragment {
     private FirebaseUser firebaseUser;
     private FirebaseFirestore db;
     private String userId;
-
+    private String sortType = "";
     // shared prefs
     private SharedPreferences sharedPreferences;
 
@@ -101,6 +101,18 @@ public class NotesFragment extends Fragment {
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.sort_array, android.R.layout.simple_spinner_dropdown_item);
         sortBySpinner.setAdapter(spinnerAdapter);
+        sortBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                doSort(position);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         listView = root.findViewById(R.id.notes);
 
         // Firebase Authentication
@@ -203,6 +215,60 @@ public class NotesFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void doSort(int type) {
+        Query.Direction direction = Query.Direction.DESCENDING;
+        switch(type) {
+            case 0: //Time
+                sortType = "timestamp";
+                break;
+            case 1: //Mood
+                sortType = "emotion";
+                break;
+            case 2: //Location
+                sortType = "latitude";
+                break;
+            case 3: //Alphabetical
+                sortType = "title";
+                direction = Query.Direction.ASCENDING;
+                break;
+            case 4: //ID
+                sortType = "id";
+                break;
+
+        }
+        if (firebaseUser != null) {
+            Log.d("sorting by",sortType);
+            userId = firebaseUser.getUid();
+
+            db = FirebaseFirestore.getInstance();
+
+            // Listen for DB changes
+            db.collection("users").document(userId)
+                    .collection("notes")
+                    .orderBy(sortType, direction)
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w("EXS", "Listen failed.", e);
+                                return;
+                            }
+
+                            notesList = new ArrayList<>();
+                            for (QueryDocumentSnapshot doc : value) {
+                                NotesBuilder note = doc.toObject(NotesBuilder.class);
+                                note.setId(doc.getId());
+                                notesList.add(note);
+                            }
+                            // set adapter
+                            nAdapter = new NotesAdapter(notesList, getActivity());
+                            listView.setAdapter(nAdapter);
+                        }
+                    });
+        }
     }
 
     // Put them back after config change

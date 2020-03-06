@@ -1,6 +1,7 @@
 package yw.main.babble;
 
 import android.Manifest;
+import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -26,6 +27,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import yw.main.babble.ui.ThemeChangeFragment;
+
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private static final int PERMISSIONS_REQUEST = 1;
@@ -38,7 +41,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTheme(R.style.HeartsTheme);
+        // setting theme
+        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        Log.d("theme", theme);
+        switch(theme){
+            case "HeartsTheme":
+                setTheme(R.style.HeartsTheme);
+                break;
+            case "JournalTheme":
+                setTheme(R.style.JournalTheme);
+                break;
+            case "NauticalTheme":
+                setTheme(R.style.NavalTheme);
+                break;
+            case "DefaultTheme":
+                setTheme(R.style.DefaultTheme);
+                break;
+            case "":
+                break;
+        }
+
         // Here we check if the user is logged in and, if not, open the login screen
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
@@ -61,6 +83,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void onResume(){
         super.onResume();
+
+        // setting theme
+        String theme = ThemeChangeFragment.whichTheme(getApplicationContext());
+        Log.d("theme", theme);
+        switch(theme){
+            case "HeartsTheme":
+                setTheme(R.style.HeartsTheme);
+                break;
+            case "JournalTheme":
+                setTheme(R.style.JournalTheme);
+                break;
+            case "NauticalTheme":
+                setTheme(R.style.NavalTheme);
+                break;
+            case "DefaultTheme":
+                setTheme(R.style.DefaultTheme);
+                break;
+            case "":
+                break;
+        }
+
         if (firebaseUser != null){
             /*setContentView(R.layout.activity_main);
             Toolbar toolbar = findViewById(R.id.toolbar);

@@ -103,11 +103,7 @@ public class Glyphs {
                     Log.d("drawString()","cursorLocationFound");
                     canvas.drawLine((float) (x+(textPosition*CHAR_BITMAP_WIDTH*size)), y, (float) (x+(textPosition*(CHAR_BITMAP_WIDTH*size))), (float) (y+(CHAR_BITMAP_HEIGHT*size)), p);
                 }
-                if(ch.equals('\n')) {
-                    y+= CHAR_BITMAP_HEIGHT*size;
-                    textPosition = 0;
-                    continue;
-                }
+
                 if(glyphs.get(ch) != null) {
 //                    canvas.drawBitmap(glyphs.get(ch), x + (i* CHAR_BITMAP_WIDTH), y, null);
                     canvas.drawBitmap(glyphs.get(ch), null, new Rect(
@@ -116,6 +112,10 @@ public class Glyphs {
                             null);
                 }
                 textPosition++;
+                if(ch.equals('\n')) {
+                    y+= CHAR_BITMAP_HEIGHT*size;
+                    textPosition = 0;
+                }
             }
             if(i == cursorLocation) {
                 Paint p = new Paint();
