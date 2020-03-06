@@ -173,76 +173,81 @@ public class NoteActivity extends AppCompatActivity implements LocationListener 
                 if (title != null) {
                     title = titleEditText.getText().toString();
                 }
-                content = editText.getText().toString();
-                // Build the tone options
-                options = new ToneOptions.Builder().text(content).build();
-                // Query the service
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
-                        List<ToneScore> scores = toneAnalysis.getDocumentTone()
-                                .getTones();
-                        double max = 0;
-                        // Take the emotion with the highest score
-                        for(ToneScore score:scores) {
-                            if (score.getScore() > max) {
-                                max = score.getScore();
-                                detectedTone = score.getToneName().toUpperCase();
+
+                if (!editText.getText().toString().isEmpty())  {
+
+                    // Only do save if you have content
+                    content = editText.getText().toString();
+                    // Build the tone options
+                    options = new ToneOptions.Builder().text(content).build();
+                    // Query the service
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToneAnalysis toneAnalysis = toneAnalyzer.tone(options).execute().getResult();
+                            List<ToneScore> scores = toneAnalysis.getDocumentTone()
+                                    .getTones();
+                            double max = 0;
+                            // Take the emotion with the highest score
+                            for(ToneScore score:scores) {
+                                if (score.getScore() > max) {
+                                    max = score.getScore();
+                                    detectedTone = score.getToneName().toUpperCase();
+                                }
                             }
-                        }
-                        toastMessage =
-                                "The following emotions were detected:\n\n"
-                                        + detectedTone.toUpperCase();
+                            toastMessage =
+                                    "The following emotions were detected:\n\n"
+                                            + detectedTone.toUpperCase();
 
-                        // Save to firebase
-                        switch (mode) {
-                            case NEW_NOTE:
-                                newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
-                                Log.d("title", title);
-                                newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
-                                    db.collection("users").document(userId)
-                                            .collection("notes").add(newNote);
-                                break;
-                            case UPDATE_NOTE:
+                            // Save to firebase
+                            switch (mode) {
+                                case NEW_NOTE:
+                                    newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
+                                    Log.d("title", title);
+                                    newNote = new NotesBuilder(title, content, detectedTone, currentLatitude, currentLongitude);
+                                        db.collection("users").document(userId)
+                                                .collection("notes").add(newNote);
+                                    break;
+                                case UPDATE_NOTE:
 
-                                    DocumentReference notesRef = db.collection("users").document(userId)
-                                            .collection("notes").document(docId);
-                                    Map<String,Object> updates = new HashMap<>();
-                                    updates.put("id", docId);
-                                    updates.put("content", content);
-                                    updates.put("title", titleEditText.getText().toString());
-                                    updates.put("latitude", currentLatitude);
-                                    updates.put("longitude", currentLongitude);
-                                    updates.put("emotion", detectedTone);
-                                    updates.put("timestamp", FieldValue.serverTimestamp());
-                                    notesRef.update(updates)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d("EXS", "DocumentSnapshot successfully updated!");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.w("EXS", "Error updating document", e);
-                                                }
-                                            });
+                                        DocumentReference notesRef = db.collection("users").document(userId)
+                                                .collection("notes").document(docId);
+                                        Map<String,Object> updates = new HashMap<>();
+                                        updates.put("id", docId);
+                                        updates.put("content", content);
+                                        updates.put("title", titleEditText.getText().toString());
+                                        updates.put("latitude", currentLatitude);
+                                        updates.put("longitude", currentLongitude);
+                                        updates.put("emotion", detectedTone);
+                                        updates.put("timestamp", FieldValue.serverTimestamp());
+                                        notesRef.update(updates)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d("EXS", "DocumentSnapshot successfully updated!");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w("EXS", "Error updating document", e);
+                                                    }
+                                                });
 
-                                break;
-                        }
-
-                        // Run the toast on UI
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getBaseContext(),
-                                        toastMessage, Toast.LENGTH_LONG).show();
+                                    break;
                             }
-                        });
-                    }
-                });
+
+                            // Run the toast on UI
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getBaseContext(),
+                                            toastMessage, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                }
                 setResult(Activity.RESULT_OK, intent);
                 // close the activity
                 finish();
