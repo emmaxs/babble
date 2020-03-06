@@ -72,27 +72,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (savedInstanceState != null) {
             isMapZoomed = savedInstanceState.getBoolean(ZOOM_STATUS);
         }
-    }
 
-
-    public void onSaveInstanceState(Bundle bundle) {
-        super.onSaveInstanceState(bundle);
-        bundle.putBoolean(ZOOM_STATUS, isMapZoomed);
-    }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
+        // Start collecting the emotions o place on the map
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -117,14 +98,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        // Start once the map exists
+                                        while (mMap == null) {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (Exception e) {}
+                                        }
+
                                         // clear the old list
                                         if (emotionMarkers != null) {
-                                            for (Marker marker: emotionMarkers) {
+                                            for (Marker marker : emotionMarkers) {
                                                 marker.remove();
                                             }
                                         }
                                         emotionMarkers = new ArrayList<>();
-                                        for (MarkerOptions marker: emotionMarkerOptions) {
+                                        for (MarkerOptions marker : emotionMarkerOptions) {
                                             emotionMarkers.add(mMap.addMarker(marker));
                                         }
                                     }
@@ -133,6 +121,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         });
             }
         });
+    }
+
+
+    public void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        bundle.putBoolean(ZOOM_STATUS, isMapZoomed);
+    }
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
     }
 
     private void initLocationManager(){
