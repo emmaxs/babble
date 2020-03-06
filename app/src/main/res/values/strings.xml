@@ -50,4 +50,6 @@
         <item>Length</item>
         <item>ID</item>
     </string-array>
+
+    <string name="chartTitle">Emotions of Other Babble Users</string>
 </resources>
